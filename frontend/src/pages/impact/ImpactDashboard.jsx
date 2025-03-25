@@ -19,16 +19,14 @@ import {
   Alert,
   AlertTitle
 } from '@mui/material';
-import {
-  Eco as EcoIcon,
-  LocalShipping as ShippingIcon,
-  Restaurant as FoodIcon,
-  Co2 as CarbonIcon,
-  Water as WaterIcon,
-  People as PeopleIcon,
-  Favorite as HeartIcon,
-  Warning as WarningIcon
-} from '@mui/icons-material';
+import EcoIcon from '@mui/icons-material/Eco';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import Co2Icon from '@mui/icons-material/Co2';
+import WaterIcon from '@mui/icons-material/Water';
+import PeopleIcon from '@mui/icons-material/People';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import WarningIcon from '@mui/icons-material/Warning';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import axios from 'axios';
 
@@ -391,7 +389,7 @@ const ImpactDashboard = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
-                        <EcoIcon color="success" />
+                          <EcoIcon color="success" />
                       </ListItemIcon>
                       <ListItemText
                         primary={`${impactData.totalFoodSaved.toLocaleString()} kg of food diverted from landfill`}

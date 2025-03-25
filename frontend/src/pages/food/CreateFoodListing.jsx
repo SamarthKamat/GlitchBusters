@@ -21,6 +21,7 @@ import {
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import enUS from 'date-fns/locale/en-US';
 import { format } from 'date-fns';
 import {
   createFoodListingStart,
@@ -285,7 +286,7 @@ const CreateFoodListing = () => {
             </Grid>
             
             <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={enUS}>
                 <DateTimePicker
                   label="Expiry Date"
                   value={formData.expiryDate}
@@ -303,7 +304,7 @@ const CreateFoodListing = () => {
             </Grid>
             
             <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={enUS}>
                 <DateTimePicker
                   label="Pickup Time"
                   value={formData.pickupTime}

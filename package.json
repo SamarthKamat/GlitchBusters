@@ -22,6 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "@date-io/date-fns": "^3.2.1",
+    "@mui/icons-material": "^6.4.8",
     "@mui/x-date-pickers": "^7.28.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
