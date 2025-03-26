@@ -172,7 +172,7 @@ const Settings = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, width: '100%' }}>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}

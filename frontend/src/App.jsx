@@ -23,7 +23,7 @@ import FoodListingDetails from './pages/food/FoodListingDetails';
 import CreateFoodListing from './pages/food/CreateFoodListing';
 
 // Impact & Statistics Pages
-import ImpactDashboard from './pages/impact/ImpactDashboard';
+// Removed Impact Dashboard import
 
 // Profile & Settings Pages
 import Profile from './pages/profile/Profile';
@@ -75,7 +75,7 @@ const App = () => {
           <Route path="/food-listings/create" element={<CreateFoodListing />} />
 
           {/* Impact & Statistics Routes */}
-          <Route path="/impact" element={<ImpactDashboard />} />
+          {/* Removed Impact Dashboard Route */}
 
           {/* Profile & Settings Routes */}
           <Route path="/profile" element={<Profile />} />

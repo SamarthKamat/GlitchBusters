@@ -49,7 +49,30 @@ const Register = () => {
       const { confirmPassword, ...registerData } = values;
       const response = await axios.post('/api/auth/register', registerData);
       dispatch(registerSuccess(response.data));
-      navigate('/dashboard');
+      
+      // Use role-based dashboard routing instead of hardcoded '/dashboard'
+      const userRole = response.data.user.role;
+      let dashboardRoute = '/dashboard';
+      
+      // Determine the correct dashboard based on user role
+      switch (userRole) {
+        case 'business':
+          dashboardRoute = '/dashboard/business';
+          break;
+        case 'charity':
+          dashboardRoute = '/dashboard/charity';
+          break;
+        case 'volunteer':
+          dashboardRoute = '/dashboard/volunteer';
+          break;
+        case 'admin':
+          dashboardRoute = '/dashboard/admin';
+          break;
+        default:
+          dashboardRoute = '/dashboard/business'; // Default fallback
+      }
+      
+      navigate(dashboardRoute);
     } catch (err) {
       dispatch(registerFailure(err.response?.data?.message || 'Registration failed'));
     } finally {
@@ -63,18 +86,21 @@ const Register = () => {
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
-        background: 'linear-gradient(45deg, #2E7D32 30%, #1B5E20 90%)'
+        justifyContent: 'center',
+        background: 'linear-gradient(45deg, #2E7D32 30%, #1B5E20 90%)',
+        py: { xs: 2, sm: 4 }
       }}
     >
-      <Container maxWidth="sm">
+      <Container maxWidth="sm" sx={{ width: '100%', maxWidth: '100%' }}>
         <Paper
           elevation={3}
           sx={{
-            p: 4,
+            p: { xs: 2, sm: 3, md: 4 },
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            borderRadius: 2
+            borderRadius: 2,
+            width: '100%'
           }}
         >
           <Typography

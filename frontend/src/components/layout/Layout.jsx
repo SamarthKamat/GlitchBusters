@@ -18,7 +18,8 @@ import {
   Badge,
   Menu,
   MenuItem,
-  Avatar
+  Avatar,
+  useMediaQuery
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -33,6 +34,8 @@ import {
   ExitToApp as LogoutIcon
 } from '@mui/icons-material';
 import { logout } from '../../store/slices/authSlice';
+import ThemeToggle from './ThemeToggle';
+import { useThemeContext } from '../../theme/ThemeContext';
 
 const drawerWidth = 280;
 
@@ -46,6 +49,8 @@ const Layout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const { mode } = useThemeContext();
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -79,11 +84,7 @@ const Layout = () => {
         icon: <RestaurantIcon />,
         path: '/food-listings'
       },
-      {
-        text: 'Impact Dashboard',
-        icon: <ImpactIcon />,
-        path: '/impact'
-      },
+      // Removed Impact Dashboard menu item
       {
         text: 'Profile',
         icon: <ProfileIcon />,
@@ -143,12 +144,13 @@ const Layout = () => {
             width: 64, 
             height: 64, 
             mb: 1,
-            bgcolor: 'primary.main'
+            bgcolor: 'primary.main',
+            boxShadow: mode === 'dark' ? '0 0 8px rgba(255, 255, 255, 0.2)' : 'none'
           }}
         >
           {user?.name?.charAt(0)?.toUpperCase()}
         </Avatar>
-        <Typography variant="h6" noWrap component="div">
+        <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 600 }}>
           {user?.name}
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -165,9 +167,24 @@ const Layout = () => {
                 navigate(item.path);
                 setMobileOpen(false);
               }}
+              sx={{
+                borderRadius: '8px',
+                mx: 1,
+                my: 0.5,
+                '&.Mui-selected': {
+                  bgcolor: mode === 'dark' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(46, 125, 50, 0.1)',
+                }
+              }}
             >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
+              <ListItemIcon sx={{ color: location.pathname === item.path ? 'primary.main' : 'inherit' }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText 
+                primary={item.text} 
+                primaryTypographyProps={{ 
+                  fontWeight: location.pathname === item.path ? 600 : 400 
+                }}
+              />
             </ListItemButton>
           </ListItem>
         ))}
@@ -197,10 +214,11 @@ const Layout = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 700 }}>
             Food Waste Reduction Network
           </Typography>
-          <IconButton color="inherit" onClick={handleNotificationOpen}>
+          <ThemeToggle />
+          <IconButton color="inherit" onClick={handleNotificationOpen} sx={{ mx: 1 }}>
             <Badge badgeContent={notificationCount} color="error">
               <NotificationsIcon />
             </Badge>
@@ -209,7 +227,14 @@ const Layout = () => {
             onClick={handleProfileMenuOpen}
             sx={{ ml: 1 }}
           >
-            <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+            <Avatar 
+              sx={{ 
+                width: 32, 
+                height: 32, 
+                bgcolor: 'primary.main',
+                boxShadow: mode === 'dark' ? '0 0 4px rgba(255, 255, 255, 0.2)' : 'none'
+              }}
+            >
               {user?.name?.charAt(0)?.toUpperCase()}
             </Avatar>
           </IconButton>
@@ -253,9 +278,10 @@ const Layout = () => {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          width: '100%',
           minHeight: '100vh',
-          bgcolor: 'background.default'
+          bgcolor: 'background.default',
+          transition: 'all 0.3s ease'
         }}
       >
         <Toolbar />

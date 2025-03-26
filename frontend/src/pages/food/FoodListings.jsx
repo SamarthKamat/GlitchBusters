@@ -136,7 +136,7 @@ const FoodListings = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, width: '100%' }}>
       <Box sx={{ mb: 4 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between">
           <Grid item xs={12} md={6}>

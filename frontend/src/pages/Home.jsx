@@ -68,7 +68,7 @@ const Home = () => {
           pb: { xs: 8, md: 12 }
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{ width: '100%' }}>
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={6}>
               <Typography

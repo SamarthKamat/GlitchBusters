@@ -162,7 +162,7 @@ const CreateFoodListing = () => {
 
   if (user?.role !== 'business') {
     return (
-      <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+      <Container maxWidth="md" sx={{ mt: 4, mb: 4, width: '100%' }}>
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="h5" color="error" gutterBottom>
             Access Denied
@@ -184,7 +184,7 @@ const CreateFoodListing = () => {
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="md" sx={{ mt: 4, mb: 4, width: '100%' }}>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
