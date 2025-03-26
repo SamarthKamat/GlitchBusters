@@ -63,7 +63,7 @@ const FoodListingDetails = () => {
       
       // If not in store, fetch it from the API
       try {
-        const response = await axios.get(`/api/food/${id}`, {
+        const response = await axios.get(`http://localhost:5000/api/food/${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         setListing(response.data);

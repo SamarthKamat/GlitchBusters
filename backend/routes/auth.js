@@ -18,9 +18,14 @@ const protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     req.user = await User.findById(decoded.id).select('-password');
+
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Not authorized to access this route' });
+    return res.status(401).json({ message: 'Not authorized to access this route' });
   }
 };
 
@@ -35,14 +40,20 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Create user
     user = new User({
       name,
       email,
-      password,
+      password: hashedPassword,
       role,
       organization
     });
+
+    await user.save();
 
     // Generate JWT token
     const token = jwt.sign(
@@ -50,8 +61,6 @@ router.post('/register', async (req, res) => {
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '30d' }
     );
-
-    await user.save();
 
     res.status(201).json({
       token,
@@ -73,14 +82,14 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if user exists
+    // Check if user exists and explicitly select password field
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Check password
-    const isMatch = await user.correctPassword(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -110,7 +119,10 @@ router.post('/login', async (req, res) => {
 // Get current user profile
 router.get('/me', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -126,6 +138,11 @@ router.put('/me', protect, async (req, res) => {
       { name, organization },
       { new: true, runValidators: true }
     );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

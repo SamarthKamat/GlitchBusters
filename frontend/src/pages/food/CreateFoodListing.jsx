@@ -142,7 +142,7 @@ const CreateFoodListing = () => {
       dispatch(createFoodListingStart());
       
       const response = await axios.post(
-        '/api/food',
+        'http://localhost:5000/api/food',
         {
           ...formData,
           expiryDate: format(formData.expiryDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),

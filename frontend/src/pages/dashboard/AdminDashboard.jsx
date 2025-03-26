@@ -74,13 +74,13 @@ const AdminDashboard = () => {
         dispatch(getFoodListingsStart());
         
         // Fetch food listings
-        const foodResponse = await axios.get('/api/food', {
+        const foodResponse = await axios.get('http://localhost:5000/api/food', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         dispatch(getFoodListingsSuccess(foodResponse.data));
         
         // Fetch users (admin only)
-        const usersResponse = await axios.get('/api/users', {
+        const usersResponse = await axios.get('http://localhost:5000/api/users', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         

@@ -58,7 +58,7 @@ const VolunteerDashboard = () => {
     const fetchFoodListings = async () => {
       try {
         dispatch(getFoodListingsStart());
-        const response = await axios.get('/api/food', {
+        const response = await axios.get('http://localhost:5000/api/food', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         dispatch(getFoodListingsSuccess(response.data));

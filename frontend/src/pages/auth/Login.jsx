@@ -37,7 +37,7 @@ const Login = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       dispatch(loginStart());
-      const response = await axios.post('/api/auth/login', values);
+      const response = await axios.post('http://localhost:5000/api/auth/login', values);
       dispatch(loginSuccess(response.data));
       
       // Use role-based dashboard routing instead of hardcoded '/dashboard'
@@ -83,7 +83,7 @@ const Login = () => {
     >
       <Container maxWidth="sm" sx={{ width: '100%', maxWidth: '100%' }}>
         <Paper
-          elevation={3}
+          elevation={2}
           sx={{
             p: { xs: 2, sm: 3, md: 4 },
             display: 'flex',
@@ -192,5 +192,6 @@ const Login = () => {
     </Box>
   );
 };
+
 
 export default Login;

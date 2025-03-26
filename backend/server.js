@@ -21,9 +21,10 @@ app.use(express.json());
 app.use(cors());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/food-waste-network', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  dbName: 'glitchbusters'  // specify your database name
 }).then(() => {
   console.log('MongoDB Connected');
 }).catch(err => {

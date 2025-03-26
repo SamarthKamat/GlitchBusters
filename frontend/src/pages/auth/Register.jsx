@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form } from 'formik';
@@ -33,28 +33,40 @@ const Register = () => {
       .oneOf([Yup.ref('password'), null], 'Passwords must match')
       .required('Confirm Password is required'),
     role: Yup.string().required('Role is required'),
-    organization: Yup.object().when('role', {
-      is: (role) => role !== 'volunteer',
-      then: Yup.object({
-        name: Yup.string().required('Organization name is required'),
-        address: Yup.string().required('Organization address is required'),
-        phone: Yup.string().required('Organization phone is required')
-      })
-    })
+    organization: Yup.object().shape({
+      name: Yup.string(),
+      address: Yup.string(),
+      phone: Yup.string(),
+      website: Yup.string(),
+      description: Yup.string(),
+    }).when('role', {
+      is: (role) => role === 'business' || role === 'charity',
+      then: (schema) =>
+        schema.shape({
+          name: Yup.string().required('Organization name is required'),
+          address: Yup.string().required('Organization address is required'),
+          phone: Yup.string().required('Organization phone is required'),
+        }),
+      otherwise: (schema) => schema.strip(),
+    }),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       dispatch(registerStart());
       const { confirmPassword, ...registerData } = values;
-      const response = await axios.post('/api/auth/register', registerData);
+
+      console.log("Submitting Data:", JSON.stringify(registerData, null, 2)); // Debugging Log
+
+      const response = await axios.post('http://localhost:5000/api/auth/register', registerData);
+
+      console.log("Registration Success:", response.data); // Debugging Log
+
       dispatch(registerSuccess(response.data));
       
-      // Use role-based dashboard routing instead of hardcoded '/dashboard'
       const userRole = response.data.user.role;
       let dashboardRoute = '/dashboard';
-      
-      // Determine the correct dashboard based on user role
+
       switch (userRole) {
         case 'business':
           dashboardRoute = '/dashboard/business';
@@ -69,11 +81,12 @@ const Register = () => {
           dashboardRoute = '/dashboard/admin';
           break;
         default:
-          dashboardRoute = '/dashboard/business'; // Default fallback
+          dashboardRoute = '/dashboard/business';
       }
-      
+
       navigate(dashboardRoute);
     } catch (err) {
+      console.error("Registration Error:", err.response?.data || err.message);
       dispatch(registerFailure(err.response?.data?.message || 'Registration failed'));
     } finally {
       setSubmitting(false);
@@ -91,35 +104,16 @@ const Register = () => {
         py: { xs: 2, sm: 4 }
       }}
     >
-      <Container maxWidth="sm" sx={{ width: '100%', maxWidth: '100%' }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: { xs: 2, sm: 3, md: 4 },
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            borderRadius: 2,
-            width: '100%'
-          }}
-        >
-          <Typography
-            component="h1"
-            variant="h4"
-            gutterBottom
-            sx={{ color: 'primary.main', fontWeight: 'bold' }}
-          >
+      <Container maxWidth="sm">
+        <Paper elevation={2} sx={{ p: 4, borderRadius: 2, textAlign: 'center' }}>
+          <Typography component="h1" variant="h4" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
             Create Account
           </Typography>
           <Typography variant="body1" color="text.secondary" gutterBottom>
             Join the Food Waste Reduction Network
           </Typography>
 
-          {error && (
-            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
           <Formik
             initialValues={{
@@ -128,218 +122,51 @@ const Register = () => {
               password: '',
               confirmPassword: '',
               role: '',
-              organization: {
-                name: '',
-                address: '',
-                phone: '',
-                website: '',
-                description: ''
-              }
+              organization: { name: '', address: '', phone: '', website: '', description: '' }
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
             {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
-              <Form style={{ width: '100%' }}>
+              <Form>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      id="name"
-                      name="name"
-                      label="Full Name"
-                      value={values.name}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.name && Boolean(errors.name)}
-                      helperText={touched.name && errors.name}
-                      variant="outlined"
-                    />
+                    <TextField fullWidth id="name" name="name" label="Full Name" value={values.name} onChange={handleChange} onBlur={handleBlur} error={touched.name && Boolean(errors.name)} helperText={touched.name && errors.name} />
                   </Grid>
-
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      id="email"
-                      name="email"
-                      label="Email Address"
-                      value={values.email}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.email && Boolean(errors.email)}
-                      helperText={touched.email && errors.email}
-                      variant="outlined"
-                    />
+                    <TextField fullWidth id="email" name="email" label="Email Address" value={values.email} onChange={handleChange} onBlur={handleBlur} error={touched.email && Boolean(errors.email)} helperText={touched.email && errors.email} />
                   </Grid>
-
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      id="password"
-                      name="password"
-                      label="Password"
-                      type="password"
-                      value={values.password}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.password && Boolean(errors.password)}
-                      helperText={touched.password && errors.password}
-                      variant="outlined"
-                    />
+                    <TextField fullWidth id="password" name="password" label="Password" type="password" value={values.password} onChange={handleChange} onBlur={handleBlur} error={touched.password && Boolean(errors.password)} helperText={touched.password && errors.password} />
                   </Grid>
-
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      label="Confirm Password"
-                      type="password"
-                      value={values.confirmPassword}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.confirmPassword && Boolean(errors.confirmPassword)}
-                      helperText={touched.confirmPassword && errors.confirmPassword}
-                      variant="outlined"
-                    />
+                    <TextField fullWidth id="confirmPassword" name="confirmPassword" label="Confirm Password" type="password" value={values.confirmPassword} onChange={handleChange} onBlur={handleBlur} error={touched.confirmPassword && Boolean(errors.confirmPassword)} helperText={touched.confirmPassword && errors.confirmPassword} />
                   </Grid>
-
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      id="role"
-                      name="role"
-                      select
-                      label="Role"
-                      value={values.role}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.role && Boolean(errors.role)}
-                      helperText={touched.role && errors.role}
-                      variant="outlined"
-                    >
+                    <TextField fullWidth id="role" name="role" select label="Role" value={values.role} onChange={handleChange} onBlur={handleBlur} error={touched.role && Boolean(errors.role)} helperText={touched.role && errors.role}>
                       <MenuItem value="business">Business</MenuItem>
                       <MenuItem value="charity">Charity</MenuItem>
                       <MenuItem value="volunteer">Volunteer</MenuItem>
                     </TextField>
                   </Grid>
 
-                  {values.role && values.role !== 'volunteer' && (
+                  {values.role === 'business' || values.role === 'charity' ? (
                     <>
                       <Grid item xs={12}>
-                        <TextField
-                          fullWidth
-                          id="organization.name"
-                          name="organization.name"
-                          label="Organization Name"
-                          value={values.organization.name}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={
-                            touched.organization?.name &&
-                            Boolean(errors.organization?.name)
-                          }
-                          helperText={
-                            touched.organization?.name && errors.organization?.name
-                          }
-                          variant="outlined"
-                        />
+                        <TextField fullWidth id="organization.name" name="organization.name" label="Organization Name" value={values.organization.name} onChange={handleChange} onBlur={handleBlur} error={touched.organization?.name && Boolean(errors.organization?.name)} helperText={touched.organization?.name && errors.organization?.name} />
                       </Grid>
-
                       <Grid item xs={12}>
-                        <TextField
-                          fullWidth
-                          id="organization.address"
-                          name="organization.address"
-                          label="Organization Address"
-                          value={values.organization.address}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={
-                            touched.organization?.address &&
-                            Boolean(errors.organization?.address)
-                          }
-                          helperText={
-                            touched.organization?.address &&
-                            errors.organization?.address
-                          }
-                          variant="outlined"
-                        />
+                        <TextField fullWidth id="organization.address" name="organization.address" label="Organization Address" value={values.organization.address} onChange={handleChange} onBlur={handleBlur} error={touched.organization?.address && Boolean(errors.organization?.address)} helperText={touched.organization?.address && errors.organization?.address} />
                       </Grid>
-
                       <Grid item xs={12}>
-                        <TextField
-                          fullWidth
-                          id="organization.phone"
-                          name="organization.phone"
-                          label="Organization Phone"
-                          value={values.organization.phone}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={
-                            touched.organization?.phone &&
-                            Boolean(errors.organization?.phone)
-                          }
-                          helperText={
-                            touched.organization?.phone && errors.organization?.phone
-                          }
-                          variant="outlined"
-                        />
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <TextField
-                          fullWidth
-                          id="organization.website"
-                          name="organization.website"
-                          label="Organization Website (Optional)"
-                          value={values.organization.website}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          variant="outlined"
-                        />
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <TextField
-                          fullWidth
-                          id="organization.description"
-                          name="organization.description"
-                          label="Organization Description (Optional)"
-                          value={values.organization.description}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          multiline
-                          rows={4}
-                          variant="outlined"
-                        />
+                        <TextField fullWidth id="organization.phone" name="organization.phone" label="Organization Phone" value={values.organization.phone} onChange={handleChange} onBlur={handleBlur} error={touched.organization?.phone && Boolean(errors.organization?.phone)} helperText={touched.organization?.phone && errors.organization?.phone} />
                       </Grid>
                     </>
-                  )}
+                  ) : null}
                 </Grid>
-
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  disabled={loading || isSubmitting}
-                  sx={{ mt: 3, mb: 2 }}
-                >
+                <Button type="submit" fullWidth variant="contained" size="large" disabled={loading || isSubmitting} sx={{ mt: 3 }}>
                   {loading ? <CircularProgress size={24} /> : 'Sign Up'}
                 </Button>
-
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Already have an account?{' '}
-                    <Link
-                      to="/login"
-                      style={{ color: '#2E7D32', textDecoration: 'none' }}
-                    >
-                      Sign In
-                    </Link>
-                  </Typography>
-                </Box>
               </Form>
             )}
           </Formik>
