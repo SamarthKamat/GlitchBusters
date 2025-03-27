@@ -15,6 +15,7 @@ import BusinessDashboard from './pages/dashboard/BusinessDashboard';
 import CharityDashboard from './pages/dashboard/CharityDashboard';
 import VolunteerDashboard from './pages/dashboard/VolunteerDashboard';
 import AdminDashboard from './pages/dashboard/AdminDashboard';
+import ImpactDashboard from './pages/dashboard/ImpactDashboard';
 
 // Food Listing Pages
 import FoodListings from './pages/food/FoodListings';
@@ -83,11 +84,11 @@ const App = () => {
           <Route path="/food-listings/create" element={<CreateFoodListing />} />
 
           {/* Impact & Statistics Routes */}
-          {/* Removed Impact Dashboard Route */}
-
-          {/* Profile & Settings Routes */}
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/dashboard/impact" element={
+            <ProtectedRoute>
+              <ImpactDashboard />
+            </ProtectedRoute>
+          } />
         </Route>
 
         {/* 404 Route */}
