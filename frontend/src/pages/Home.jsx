@@ -12,8 +12,21 @@ import {
   Stack,
   Divider,
   Paper,
-  useTheme
+  useTheme,
+  LinearProgress
 } from '@mui/material';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -36,6 +49,24 @@ import {
 
 const Home = () => {
   const theme = useTheme();
+
+  // Sample data for Impact Dashboard
+  const monthlyData = [
+    { month: 'Jan', foodSaved: 1200, mealsProvided: 4800 },
+    { month: 'Feb', foodSaved: 1500, mealsProvided: 6000 },
+    { month: 'Mar', foodSaved: 1800, mealsProvided: 7200 },
+    { month: 'Apr', foodSaved: 2100, mealsProvided: 8400 },
+    { month: 'May', foodSaved: 2400, mealsProvided: 9600 },
+    { month: 'Jun', foodSaved: 2700, mealsProvided: 10800 }
+  ];
+
+  const categoryData = [
+    { category: 'Produce', amount: 3500 },
+    { category: 'Bakery', amount: 2800 },
+    { category: 'Dairy', amount: 2000 },
+    { category: 'Prepared', amount: 1500 }
+  ];
+
 
   // Hero slider images
   const heroImages = [
@@ -515,57 +546,192 @@ const Home = () => {
       </Container>
 
       {/* Impact Section */}
-      <Box sx={{ bgcolor: '#2E7D32', color: 'white', py: { xs: 8, md: 12 } }}>
+      <Box 
+        sx={{
+          bgcolor: '#2E7D32',
+          color: 'white',
+          py: { xs: 8, md: 12 },
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%)',
+            animation: 'pulse 4s ease-in-out infinite'
+          }
+        }}
+      >
         <Container>
           <Grid container spacing={6} alignItems="center">
             <Grid item xs={12} md={6}>
-              <Typography variant="h2" gutterBottom sx={{ fontWeight: 700 }}>
-                Make an Impact Today
-              </Typography>
-              <Typography variant="h6" paragraph sx={{ opacity: 0.9, mb: 4 }}>
-                Join our network and help reduce food waste while supporting those
-                in need in your community. Every meal saved is a step towards a more
-                sustainable and equitable future.
-              </Typography>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Button
-                  component={RouterLink}
-                  to="/register"
-                  variant="contained"
-                  size="large"
+              <Box sx={{
+                position: 'relative',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: -20,
+                  left: -20,
+                  width: '120%',
+                  height: '120%',
+                  background: 'radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)',
+                  animation: 'pulse 4s ease-in-out infinite'
+                }
+              }}>
+                <Typography 
+                  variant="h2" 
+                  gutterBottom 
                   sx={{
-                    bgcolor: 'white',
-                    color: '#2E7D32',
-                    '&:hover': { bgcolor: '#f0f0f0' },
-                    px: 4,
-                    py: 1.5,
-                    borderRadius: '30px',
-                    fontSize: '1.1rem'
+                    fontWeight: 700,
+                    position: 'relative',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      width: '60%',
+                      height: '4px',
+                      background: 'linear-gradient(90deg, rgba(255,255,255,0.8), transparent)',
+                      animation: 'width 2s ease-in-out'
+                    }
                   }}
                 >
-                  Get Started
-                </Button>
-                <Button
-                  component={RouterLink}
-                  to="/login"
-                  variant="outlined"
-                  size="large"
+                  Make an Impact Today
+                </Typography>
+                <Typography 
+                  variant="h6" 
+                  paragraph 
                   sx={{
-                    borderColor: 'white',
-                    color: 'white',
-                    '&:hover': {
+                    opacity: 0.9,
+                    mb: 4,
+                    lineHeight: 1.8,
+                    position: 'relative',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    animation: 'fadeIn 1s ease-in'
+                  }}
+                >
+                  Join our network and help reduce food waste while supporting those
+                  in need in your community. Every meal saved is a step towards a more
+                  sustainable and equitable future.
+                </Typography>
+                <Stack 
+                  direction={{ xs: 'column', sm: 'row' }} 
+                  spacing={2}
+                  sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    '& > *': {
+                      transition: 'all 0.3s ease-in-out',
+                      '&:hover': {
+                        transform: 'translateY(-3px)',
+                        boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+                      }
+                    }
+                  }}
+                >
+                  <Button
+                    component={RouterLink}
+                    to="/register"
+                    variant="contained"
+                    size="large"
+                    sx={{
+                      bgcolor: 'white',
+                      color: '#2E7D32',
+                      '&:hover': { 
+                        bgcolor: '#f0f0f0',
+                        boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+                      },
+                      px: 4,
+                      py: 1.5,
+                      borderRadius: '30px',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      textTransform: 'none'
+                    }}
+                  >
+                    Get Started
+                  </Button>
+                  <Button
+                    component={RouterLink}
+                    to="/login"
+                    variant="outlined"
+                    size="large"
+                    sx={{
                       borderColor: 'white',
-                      bgcolor: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    px: 4,
-                    py: 1.5,
-                    borderRadius: '30px',
-                    fontSize: '1.1rem'
-                  }}
-                >
-                  Sign In
-                </Button>
-              </Stack>
+                      color: 'white',
+                      borderWidth: '2px',
+                      '&:hover': {
+                        borderColor: 'white',
+                        bgcolor: 'rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+                      },
+                      px: 4,
+                      py: 1.5,
+                      borderRadius: '30px',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      textTransform: 'none'
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                </Stack>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <Grid container spacing={3}>
+                  {stats.map((stat, index) => (
+                    <Grid item xs={6} key={index}>
+                      <Paper
+                        sx={{
+                          p: 3,
+                          bgcolor: 'rgba(255, 255, 255, 0.1)',
+                          backdropFilter: 'blur(10px)',
+                          borderRadius: '16px',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          transition: 'all 0.3s ease-in-out',
+                          '&:hover': {
+                            transform: 'translateY(-5px)',
+                            boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
+                          }
+                        }}
+                      >
+                        <Typography variant="h3" sx={{ 
+                          color: 'white', 
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          fontSize: { xs: '1.8rem', md: '2.2rem' }
+                        }}>
+                          <span style={{ fontSize: '1.5em' }}>{stat.icon}</span>
+                          {stat.value}
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.8)', mt: 1 }}>
+                          {stat.label}
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={75 + index * 5}
+                          sx={{
+                            mt: 2,
+                            bgcolor: 'rgba(255, 255, 255, 0.2)',
+                            '& .MuiLinearProgress-bar': {
+                              bgcolor: 'white'
+                            },
+                            height: 6,
+                            borderRadius: 3
+                          }}
+                        />
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
             </Grid>
             <Grid item xs={12} md={6}>
               <Box
@@ -588,6 +754,139 @@ const Home = () => {
                   }}
                 />
               </Box>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* Impact Dashboard Section */}
+      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: '#f9f9f9' }}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            align="center"
+            sx={{ fontWeight: 700, mb: 6, color: '#2E7D32' }}
+          >
+            Our Impact
+          </Typography>
+
+          {/* Key Metrics */}
+          <Grid container spacing={3} sx={{ mb: 6 }}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ height: '100%', bgcolor: '#E8F5E9' }}>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Total Food Saved
+                  </Typography>
+                  <Typography variant="h4" component="div" sx={{ color: '#2E7D32' }}>
+                    5.9M kg
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={75} 
+                    sx={{ mt: 2, bgcolor: '#C8E6C9' }}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ height: '100%', bgcolor: '#E8F5E9' }}>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Meals Provided
+                  </Typography>
+                  <Typography variant="h4" component="div" sx={{ color: '#2E7D32' }}>
+                    4.7M
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={80} 
+                    sx={{ mt: 2, bgcolor: '#C8E6C9' }}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ height: '100%', bgcolor: '#E8F5E9' }}>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Active Donors
+                  </Typography>
+                  <Typography variant="h4" component="div" sx={{ color: '#2E7D32' }}>
+                    1062
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={65} 
+                    sx={{ mt: 2, bgcolor: '#C8E6C9' }}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ height: '100%', bgcolor: '#E8F5E9' }}>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Partner Charities
+                  </Typography>
+                  <Typography variant="h4" component="div" sx={{ color: '#2E7D32' }}>
+                    510
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={70} 
+                    sx={{ mt: 2, bgcolor: '#C8E6C9' }}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Charts */}
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={8}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>Monthly Impact</Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="foodSaved" 
+                      stroke="#2E7D32" 
+                      name="Food Saved (kg)"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="mealsProvided" 
+                      stroke="#4CAF50" 
+                      name="Meals Provided"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>Food Categories</Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={categoryData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="category" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="amount" fill="#4CAF50" name="Amount (kg)" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Paper>
             </Grid>
           </Grid>
         </Container>
