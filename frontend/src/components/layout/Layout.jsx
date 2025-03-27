@@ -36,6 +36,7 @@ import {
 import { logout } from '../../store/slices/authSlice';
 import ThemeToggle from './ThemeToggle';
 import { useThemeContext } from '../../theme/ThemeContext';
+import { Explore as ExploreIcon } from '@mui/icons-material';
 
 const drawerWidth = 280;
 
@@ -77,13 +78,19 @@ const Layout = () => {
     navigate('/login');
   };
 
+  // In the getMenuItems function, add the Explore item:
   const getMenuItems = () => {
-    const baseItems = [
-      {
-        text: 'Food Listings',
-        icon: <RestaurantIcon />,
-        path: '/food-listings'
-      },
+      const baseItems = [
+        {
+          text: 'Explore',
+          icon: <ExploreIcon />,
+          path: '/explore'
+        },
+        {
+          text: 'Food Listings',
+          icon: <RestaurantIcon />,
+          path: '/food-listings'
+        },
       // Removed Impact Dashboard menu item
       {
         text: 'Profile',

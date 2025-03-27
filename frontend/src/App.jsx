@@ -28,6 +28,7 @@ import CreateFoodListing from './pages/food/CreateFoodListing';
 // Profile & Settings Pages
 import Profile from './pages/profile/Profile';
 import Settings from './pages/profile/Settings';
+import Explore from './pages/explore/Explore';
 
 // Public Pages
 import Home from './pages/Home';
@@ -37,6 +38,8 @@ import Donations from './pages/Donations';
 import Contact from './pages/Contact';
 import Blog from './pages/Blog';
 import NotFound from './pages/NotFound';
+
+// Add import at the top with other page imports
 
 const App = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
@@ -77,6 +80,13 @@ const App = () => {
           <Route path="/dashboard/charity" element={<CharityDashboard />} />
           <Route path="/dashboard/volunteer" element={<VolunteerDashboard />} />
           <Route path="/dashboard/admin" element={<AdminDashboard />} />
+
+          {/* Add this new route */}
+          <Route path="/explore" element={<Explore />} />
+
+          {/* Profile & Settings Routes */}
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
 
           {/* Food Listing Routes */}
           <Route path="/food-listings" element={<FoodListings />} />
