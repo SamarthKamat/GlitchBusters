@@ -12,13 +12,16 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:3000']
+    origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:5173']
   }
 });
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Explicitly allow frontend origin
+  credentials: true,  // Allow credentials (cookies, auth headers)
+}));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
