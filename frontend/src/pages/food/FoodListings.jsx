@@ -22,11 +22,9 @@ import {
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  Add as AddIcon,
-  FilterList as FilterIcon
+  Add as AddIcon
 } from '@mui/icons-material';
-import { format } from 'date-fns';
-import '@mui/x-date-pickers/AdapterDateFns';
+import { format, isValid, parseISO } from 'date-fns';
 import {
   getFoodListingsStart,
   getFoodListingsSuccess,
@@ -75,35 +73,13 @@ const FoodListings = () => {
   };
 
   const filteredListings = foodListings.filter((listing) => {
-    // Search term filter
     const matchesSearch = listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          listing.description.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Category filter
     const matchesCategory = filters.category ? listing.category === filters.category : true;
-    
-    // Status filter
     const matchesStatus = filters.status ? listing.status === filters.status : true;
     
     return matchesSearch && matchesCategory && matchesStatus;
   });
-
-  const categories = [
-    { value: 'produce', label: 'Produce' },
-    { value: 'bakery', label: 'Bakery' },
-    { value: 'dairy', label: 'Dairy' },
-    { value: 'meat', label: 'Meat' },
-    { value: 'prepared', label: 'Prepared Food' },
-    { value: 'canned', label: 'Canned Goods' },
-    { value: 'dry', label: 'Dry Goods' }
-  ];
-
-  const statuses = [
-    { value: 'available', label: 'Available' },
-    { value: 'claimed', label: 'Claimed' },
-    { value: 'in_transit', label: 'In Transit' },
-    { value: 'delivered', label: 'Delivered' }
-  ];
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -118,6 +94,18 @@ const FoodListings = () => {
       default:
         return 'default';
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Not specified';
+    const date = parseISO(dateString);
+    return isValid(date) ? format(date, 'PPP') : 'Invalid date';
+  };
+  
+  const formatDateTime = (dateString) => {
+    if (!dateString) return 'Not specified';
+    const date = parseISO(dateString);
+    return isValid(date) ? format(date, 'PPp') : 'Invalid date';
   };
 
   if (loading) {
@@ -137,27 +125,9 @@ const FoodListings = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4, width: '100%' }}>
-      <Box sx={{ mb: 4 }}>
-        <Grid container spacing={2} alignItems="center" justifyContent="space-between">
-          <Grid item xs={12} md={6}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Food Listings
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
-            {user?.role === 'business' && (
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                onClick={() => navigate('/food-listings/create')}
-              >
-                Create Listing
-              </Button>
-            )}
-          </Grid>
-        </Grid>
-      </Box>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Food Listings
+      </Typography>
 
       {/* Search and Filters */}
       <Box sx={{ mb: 4 }}>
@@ -184,15 +154,16 @@ const FoodListings = () => {
                 labelId="category-filter-label"
                 name="category"
                 value={filters.category}
-                label="Category"
                 onChange={handleFilterChange}
               >
                 <MenuItem value="">All Categories</MenuItem>
-                {categories.map((category) => (
-                  <MenuItem key={category.value} value={category.value}>
-                    {category.label}
-                  </MenuItem>
-                ))}
+                <MenuItem value="produce">Produce</MenuItem>
+                <MenuItem value="bakery">Bakery</MenuItem>
+                <MenuItem value="dairy">Dairy</MenuItem>
+                <MenuItem value="meat">Meat</MenuItem>
+                <MenuItem value="prepared">Prepared Food</MenuItem>
+                <MenuItem value="canned">Canned Goods</MenuItem>
+                <MenuItem value="dry">Dry Goods</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -203,15 +174,13 @@ const FoodListings = () => {
                 labelId="status-filter-label"
                 name="status"
                 value={filters.status}
-                label="Status"
                 onChange={handleFilterChange}
               >
                 <MenuItem value="">All Statuses</MenuItem>
-                {statuses.map((status) => (
-                  <MenuItem key={status.value} value={status.value}>
-                    {status.label}
-                  </MenuItem>
-                ))}
+                <MenuItem value="available">Available</MenuItem>
+                <MenuItem value="claimed">Claimed</MenuItem>
+                <MenuItem value="in_transit">In Transit</MenuItem>
+                <MenuItem value="delivered">Delivered</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -246,11 +215,11 @@ const FoodListings = () => {
                       color={getStatusColor(listing.status)}
                     />
                   </Stack>
-                  <Typography variant="body2">
-                    Expires: {format(new Date(listing.expiryDate), 'PPP')}
+                  <Typography variant="body2" color="text.secondary">
+                    Expires: {formatDate(listing.expiryDate)}
                   </Typography>
-                  <Typography variant="body2">
-                    Pickup: {format(new Date(listing.pickupTime), 'PPp')}
+                  <Typography variant="body2" color="text.secondary">
+                    Pickup: {formatDateTime(listing.pickupTime)}
                   </Typography>
                 </CardContent>
                 <CardActions>
@@ -265,34 +234,9 @@ const FoodListings = () => {
             </Grid>
           ))
         ) : (
-          <Grid item xs={12}>
-            <Box
-              sx={{
-                textAlign: 'center',
-                py: 5
-              }}
-            >
-              <Typography variant="h6" color="text.secondary" gutterBottom>
-                No food listings found
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {searchTerm || filters.category || filters.status
-                  ? 'Try adjusting your search or filters'
-                  : 'Be the first to create a food listing'}
-              </Typography>
-              {user?.role === 'business' && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<AddIcon />}
-                  onClick={() => navigate('/food-listings/create')}
-                  sx={{ mt: 2 }}
-                >
-                  Create Listing
-                </Button>
-              )}
-            </Box>
-          </Grid>
+          <Typography variant="h6" color="text.secondary" textAlign="center">
+            No food listings found
+          </Typography>
         )}
       </Grid>
     </Container>

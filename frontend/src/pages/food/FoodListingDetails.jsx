@@ -27,7 +27,8 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material';
-import { format } from 'date-fns';
+// Add isValid and parseISO to the date-fns import
+import { format, isValid, parseISO } from 'date-fns';
 import '@mui/x-date-pickers/AdapterDateFns';
 import {
   updateFoodListingStart,
@@ -210,7 +211,7 @@ const FoodListingDetails = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <TimeIcon color="action" sx={{ mr: 1 }} />
                   <Typography variant="body2">
-                    <strong>Expiry Date:</strong> {format(new Date(listing.expiryDate), 'PPP')}
+                    <strong>Expiry Date:</strong> {formatDate(listing.expiryDate)}
                   </Typography>
                 </Box>
               </Grid>
@@ -218,7 +219,7 @@ const FoodListingDetails = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <TimeIcon color="action" sx={{ mr: 1 }} />
                   <Typography variant="body2">
-                    <strong>Pickup Time:</strong> {format(new Date(listing.pickupTime), 'PPp')}
+                    <strong>Pickup Time:</strong> {formatDateTime(listing.pickupTime)}
                   </Typography>
                 </Box>
               </Grid>
@@ -373,3 +374,27 @@ const FoodListingDetails = () => {
 };
 
 export default FoodListingDetails;
+
+const formatDate = (dateString) => {
+  try {
+    if (!dateString) return 'Not specified';
+    const date = parseISO(dateString);
+    if (!isValid(date)) return 'Invalid date';
+    return format(date, 'PPP');
+  } catch (error) {
+    console.error('Date formatting error:', error);
+    return 'Invalid date';
+  }
+};
+
+const formatDateTime = (dateString) => {
+  try {
+    if (!dateString) return 'Not specified';
+    const date = parseISO(dateString);
+    if (!isValid(date)) return 'Invalid date';
+    return format(date, 'PPp');
+  } catch (error) {
+    console.error('Date formatting error:', error);
+    return 'Invalid date';
+  }
+};

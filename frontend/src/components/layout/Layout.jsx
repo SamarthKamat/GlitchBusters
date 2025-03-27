@@ -50,7 +50,7 @@ const Layout = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { mode } = useThemeContext();
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
+  // const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
