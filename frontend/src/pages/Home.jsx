@@ -13,7 +13,8 @@ import {
   Divider,
   Paper,
   useTheme,
-  LinearProgress
+  LinearProgress,
+  IconButton // Add this import
 } from '@mui/material';
 import {
   BarChart,
@@ -67,7 +68,13 @@ const Home = () => {
     { category: 'Prepared', amount: 1500 }
   ];
 
-
+ // Add these constants at the top of the component, after the stats array
+ const socialLinks = { 
+  facebook: 'https://facebook.com/glitchbusters',
+  linkedin: 'https://linkedin.com/company/glitchbusters',
+  instagram: 'https://instagram.com/glitchbusters',
+  youtube: 'https://youtube.com/@glitchbusters'
+};
   // Hero slider images
   const heroImages = [
     {
@@ -177,11 +184,40 @@ const Home = () => {
                 <Typography variant="body2">+1 800 123 4567</Typography>
               </Stack>
             </Stack>
+
             <Stack direction="row" spacing={2}>
-              <FacebookIcon fontSize="small" />
-              <LinkedInIcon fontSize="small" />
-              <InstagramIcon fontSize="small" />
-              <YouTubeIcon fontSize="small" />
+              <IconButton 
+                href={socialLinks.facebook} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                sx={{ color: 'white', p: 0 }}
+              >
+                <FacebookIcon fontSize="small" />
+              </IconButton>
+              <IconButton 
+                href={socialLinks.linkedin} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                sx={{ color: 'white', p: 0 }}
+              >
+                <LinkedInIcon fontSize="small" />
+              </IconButton>
+              <IconButton 
+                href={socialLinks.instagram} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                sx={{ color: 'white', p: 0 }}
+              >
+                <InstagramIcon fontSize="small" />
+              </IconButton>
+              <IconButton 
+                href={socialLinks.youtube} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                sx={{ color: 'white', p: 0 }}
+              >
+                <YouTubeIcon fontSize="small" />
+              </IconButton>
             </Stack>
           </Stack>
         </Container>
@@ -904,11 +940,46 @@ const Home = () => {
                 Our mission is to reduce food waste by connecting businesses with surplus food to local charities, creating a more sustainable and equitable food system.
               </Typography>
               <Stack direction="row" spacing={2}>
-                <FacebookIcon />
-                <LinkedInIcon />
-                <InstagramIcon />
-                <YouTubeIcon />
-                <WhatsAppIcon />
+                <IconButton 
+                  href={socialLinks.facebook} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  sx={{ color: 'white', '&:hover': { color: '#4267B2' } }}
+                >
+                  <FacebookIcon />
+                </IconButton>
+                <IconButton 
+                  href={socialLinks.linkedin} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  sx={{ color: 'white', '&:hover': { color: '#0077B5' } }}
+                >
+                  <LinkedInIcon />
+                </IconButton>
+                <IconButton 
+                  href={socialLinks.instagram} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  sx={{ color: 'white', '&:hover': { color: '#E4405F' } }}
+                >
+                  <InstagramIcon />
+                </IconButton>
+                <IconButton 
+                  href={socialLinks.youtube} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  sx={{ color: 'white', '&:hover': { color: '#FF0000' } }}
+                >
+                  <YouTubeIcon />
+                </IconButton>
+                <IconButton 
+                  href="https://wa.me/18001234567" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  sx={{ color: 'white', '&:hover': { color: '#25D366' } }}
+                >
+                  <WhatsAppIcon />
+                </IconButton>
               </Stack>
             </Grid>
             <Grid item xs={12} md={4}>

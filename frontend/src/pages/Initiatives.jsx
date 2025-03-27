@@ -1,5 +1,14 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import {
+  LocalShipping as DeliveryIcon,
+  DirectionsBike as VolunteerIcon,
+  School as EducationIcon,
+  Campaign as CampaignIcon,
+  Business as BusinessIcon,
+  ArrowForward as ArrowForwardIcon
+} from '@mui/icons-material';
+import { Box, Container, Grid, Typography, Button, Card, CardContent, Divider, Chip } from '@mui/material';
 
 const Initiatives = () => {
   // Initiatives data
@@ -118,7 +127,7 @@ const Initiatives = () => {
             <Grid item xs={12} md={6}>
               <Box 
                 component="img"
-                src="https://images.unsplash.com/photo-1593113598332-cd59a0c3a9a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+                src="/assets/TheBenifitsofContributingtoFoodDonationDrives.jpeg"
                 alt="Food donation volunteers"
                 sx={{
                   width: '100%',
