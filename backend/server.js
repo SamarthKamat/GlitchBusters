@@ -48,6 +48,8 @@ io.on('connection', (socket) => {
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/food', require('./routes/food'));
+app.use('/api/search', require('./routes/search/search'));
+app.use('/api/recommendations', require('./routes/recommendation/recommendations'));
 
 
 // API Routes for Charity Requests

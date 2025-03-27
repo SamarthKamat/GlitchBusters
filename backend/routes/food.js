@@ -163,4 +163,51 @@ router.get('/stats/impact', protect, async (req, res) => {
   }
 });
 
+// Get listings by donor
+router.get('/my-listings', protect, async (req, res) => {
+  try {
+    if (req.user.role !== 'business') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const foodListings = await Food.find({ donor: req.user.id })
+      .populate('claimedBy', 'name organization')
+      .populate('volunteer', 'name')
+      .sort({ createdAt: -1 });
+
+    res.json(foodListings);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Update a food listing
+router.put('/:id', protect, async (req, res) => {
+  try {
+    const foodListing = await Food.findById(req.params.id);
+
+    if (!foodListing) {
+      return res.status(404).json({ message: 'Food listing not found' });
+    }
+
+    if (foodListing.donor.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to update this listing' });
+    }
+
+    if (foodListing.status !== 'available') {
+      return res.status(400).json({ message: 'Cannot update claimed or delivered listings' });
+    }
+
+    const updatedListing = await Food.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body },
+      { new: true }
+    );
+
+    res.json(updatedListing);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 module.exports = router;

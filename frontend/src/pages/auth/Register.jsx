@@ -156,7 +156,7 @@ const Register = () => {
                         <MenuItem value="business">Business</MenuItem>
                         <MenuItem value="charity">Charity</MenuItem>
                         <MenuItem value="volunteer">Volunteer</MenuItem>
-                        <MenuItem value="Admin">Volunteer</MenuItem>
+                        <MenuItem value="admin">Volunteer</MenuItem>
                       </TextField>
                     </Grid>
 

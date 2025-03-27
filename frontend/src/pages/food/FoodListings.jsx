@@ -32,6 +32,35 @@ import {
 } from '../../store/slices/foodSlice';
 import axios from 'axios';
 
+// Add this function before the FoodListings component
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'available':
+      return 'success';
+    case 'claimed':
+      return 'primary';
+    case 'in_transit':
+      return 'warning';
+    case 'delivered':
+      return 'info';
+    default:
+      return 'default';
+  }
+};
+
+// Also add the formatDate and formatDateTime functions that are used
+const formatDate = (date) => {
+  if (!date) return 'N/A';
+  const parsedDate = parseISO(date);
+  return isValid(parsedDate) ? format(parsedDate, 'MMM dd, yyyy') : 'Invalid Date';
+};
+
+const formatDateTime = (date) => {
+  if (!date) return 'N/A';
+  const parsedDate = parseISO(date);
+  return isValid(parsedDate) ? format(parsedDate, 'MMM dd, yyyy hh:mm a') : 'Invalid Date';
+};
+
 const FoodListings = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -72,62 +101,41 @@ const FoodListings = () => {
     });
   };
 
+  // Filter listings based on user role and status
   const filteredListings = foodListings.filter((listing) => {
     const matchesSearch = listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          listing.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filters.category ? listing.category === filters.category : true;
     const matchesStatus = filters.status ? listing.status === filters.status : true;
     
+    // For business users, only show their unclaimed listings
+    if (user?.role === 'business') {
+      return matchesSearch && 
+             matchesCategory && 
+             matchesStatus && 
+             listing.businessId === user._id && 
+             listing.status === 'available';
+    }
+    
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'available':
-        return 'success';
-      case 'claimed':
-        return 'primary';
-      case 'in_transit':
-        return 'info';
-      case 'delivered':
-        return 'secondary';
-      default:
-        return 'default';
-    }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Not specified';
-    const date = parseISO(dateString);
-    return isValid(date) ? format(date, 'PPP') : 'Invalid date';
-  };
-  
-  const formatDateTime = (dateString) => {
-    if (!dateString) return 'Not specified';
-    const date = parseISO(dateString);
-    return isValid(date) ? format(date, 'PPp') : 'Invalid date';
-  };
-
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '60vh'
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4, width: '100%' }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Food Listings
-      </Typography>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
+        <Typography variant="h4" component="h1">
+          Food Listings
+        </Typography>
+        {user?.role === 'business' && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/food-listings/create')}
+          >
+            Create New Listing
+          </Button>
+        )}
+      </Stack>
 
       {/* Search and Filters */}
       <Box sx={{ mb: 4 }}>

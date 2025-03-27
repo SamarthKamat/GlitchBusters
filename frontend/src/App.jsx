@@ -22,6 +22,12 @@ import FoodListings from './pages/food/FoodListings';
 import FoodListingDetails from './pages/food/FoodListingDetails';
 import CreateFoodListing from './pages/food/CreateFoodListing';
 
+// Food Request Pages - commented out
+import FoodRequests from './pages/food-request/FoodRequests';
+import CreateFoodRequest from './pages/food-request/CreateFoodRequest';
+import FoodRequestDetails from './pages/food-request/FoodRequestDetails';
+
+
 // Impact & Statistics Pages
 // Removed Impact Dashboard import
 
@@ -59,6 +65,15 @@ const App = () => {
         return '/login';
     }
   };
+   const CharityRoute = ({ children }) => {
+     const { user } = useSelector((state) => state.auth);
+     return user?.role === 'charity' ? children : <Navigate to="/explore" />;
+   };
+
+   const BusinessRoute = ({ children }) => {
+    const { user } = useSelector((state) => state.auth);
+    return user?.role === 'business' ? children : <Navigate to="/explore" />;
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -87,11 +102,33 @@ const App = () => {
           {/* Profile & Settings Routes */}
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
-
-          {/* Food Listing Routes */}
-          <Route path="/food-listings" element={<FoodListings />} />
+          
+          {/* Food Listing Routes - Business Only */}
+          <Route path="/food-listings" element={
+            <BusinessRoute>
+              <FoodListings />
+            </BusinessRoute>
+          } />
+          <Route path="/food-listings/create" element={
+            <BusinessRoute>
+              <CreateFoodListing />
+            </BusinessRoute>
+          } />
           <Route path="/food-listings/:id" element={<FoodListingDetails />} />
           <Route path="/food-listings/create" element={<CreateFoodListing />} />
+
+          {/* Food Request Routes - Charity Only - Temporarily Disabled */}
+          <Route path="/food-requests" element={
+            <CharityRoute>
+              <FoodRequests />
+            </CharityRoute>
+          } />
+          <Route path="/food-requests/create" element={
+            <CharityRoute>
+              <CreateFoodRequest />
+            </CharityRoute>
+          } />
+          <Route path="/food-requests/:id" element={<FoodRequestDetails />} />
 
           {/* Impact & Statistics Routes */}
           <Route path="/dashboard/impact" element={
@@ -109,3 +146,4 @@ const App = () => {
 };
 
 export default App;
+
