@@ -49,6 +49,15 @@ io.on('connection', (socket) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/food', require('./routes/food'));
 
+
+// API Routes for Charity Requests
+app.use('/api/charity_request', require('./routes/charity_request/create_request'));
+app.use('/api/charity_request', require('./routes/charity_request/get_requests'));
+app.use('/api/charity_request', require('./routes/charity_request/donate'));
+app.use('/api/charity_request', require('./routes/charity_request/change_requests'));
+
+
+
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
