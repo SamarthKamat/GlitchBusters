@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply font-sans text-gray-800 bg-gray-50 dark:bg-gray-900 dark:text-white;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors duration-300 shadow-md;
+  }
+  .btn-secondary {
+    @apply px-6 py-2 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition-colors duration-300 shadow-md;
+  }
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transition-all duration-300;
+  }
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white;
+  }
+  .section-title {
+    @apply text-3xl font-bold text-gray-800 dark:text-white mb-6;
+  }
+  .section-subtitle {
+    @apply text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4;
+  }
+}
+
+/* Hero section styles */
+.hero-slider {
+  @apply relative h-[600px] w-full overflow-hidden;
+}
+
+.hero-slide {
+  @apply h-full w-full bg-cover bg-center relative;
+}
+
+.hero-content {
+  @apply absolute inset-0 flex flex-col justify-center items-center text-center text-white p-6 bg-black bg-opacity-50;
+}
+
+/* Feature card styles */
+.feature-card {
+  @apply flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300;
+}
+
+.feature-icon {
+  @apply text-green-600 dark:text-green-400 mb-4 text-4xl;
+}
+
+/* Stats section */
+.stat-card {
+  @apply flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md;
+}
+
+.stat-number {
+  @apply text-4xl font-bold text-green-600 dark:text-green-400 mb-2;
+}
+
+/* Testimonial styles */
+.testimonial-card {
+  @apply p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md;
+}
+
+.testimonial-quote {
+  @apply text-gray-600 dark:text-gray-300 italic mb-4;
+}
+
+/* Footer styles */
+.footer {
+  @apply bg-gray-800 dark:bg-gray-900 text-white py-12;
+}
+
+.footer-link {
+  @apply hover:text-green-400 transition-colors duration-200;
+}
+
+/* Animation classes */
+.fade-in {
+  @apply opacity-0 animate-[fadeIn_1s_ease-in-out_forwards];
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide {
+  from { background-position: 0 0; }
+  to { background-position: -30px -30px; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg) translateX(100px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(100px) rotate(-360deg);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

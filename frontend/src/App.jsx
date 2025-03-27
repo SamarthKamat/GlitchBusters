@@ -1,7 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Box, CssBaseline } from '@mui/material';
 
 // Layout Components
 import Layout from './components/layout/Layout';
@@ -29,8 +28,13 @@ import CreateFoodListing from './pages/food/CreateFoodListing';
 import Profile from './pages/profile/Profile';
 import Settings from './pages/profile/Settings';
 
-// Other Pages
+// Public Pages
 import Home from './pages/Home';
+import About from './pages/About';
+import Initiatives from './pages/Initiatives';
+import Donations from './pages/Donations';
+import Contact from './pages/Contact';
+import Blog from './pages/Blog';
 import NotFound from './pages/NotFound';
 
 const App = () => {
@@ -53,11 +57,15 @@ const App = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <CssBaseline />
+    <div className="flex min-h-screen">
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/initiatives" element={<Initiatives />} />
+        <Route path="/donations" element={<Donations />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to={getDashboardRoute()} />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to={getDashboardRoute()} />} />
 
@@ -85,7 +93,7 @@ const App = () => {
         {/* 404 Route */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </Box>
+    </div>
   );
 };
 

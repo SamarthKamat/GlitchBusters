@@ -1,6 +1,4 @@
-import React, { createContext, useState, useMemo, useContext } from 'react';
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import { createAppTheme } from './index';
+import React, { createContext, useState, useEffect, useMemo, useContext } from 'react';
 
 // Create context for theme mode
 const ThemeContext = createContext({
@@ -13,15 +11,30 @@ export const useThemeContext = () => useContext(ThemeContext);
 
 // Theme provider component
 export const ThemeProvider = ({ children }) => {
-  const [mode, setMode] = useState('light');
+  const [mode, setMode] = useState(() => {
+    // Check if user has a saved preference
+    const savedMode = localStorage.getItem('theme-mode');
+    return savedMode || 'light';
+  });
 
   // Toggle between light and dark mode
   const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+    setMode((prevMode) => {
+      const newMode = prevMode === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme-mode', newMode);
+      return newMode;
+    });
   };
 
-  // Memoize the theme to prevent unnecessary re-renders
-  const theme = useMemo(() => createAppTheme(mode), [mode]);
+  // Apply dark mode class to html element
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (mode === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }, [mode]);
 
   // Memoize the context value
   const contextValue = useMemo(
@@ -34,7 +47,7 @@ export const ThemeProvider = ({ children }) => {
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
+      {children}
     </ThemeContext.Provider>
   );
 };

@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
-import CssBaseline from '@mui/material/CssBaseline';
+// Import our CSS file with Tailwind directives
+import './index.css';
 import App from './App';
 import store from './store';
 // Import the alert service for initialization
@@ -17,7 +18,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <BrowserRouter>
         <ThemeProvider>
-          <CssBaseline />
           <App />
         </ThemeProvider>
       </BrowserRouter>

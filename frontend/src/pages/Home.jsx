@@ -164,20 +164,23 @@ const Home = () => {
               GlitchBusters
             </Typography>
             <Stack direction="row" spacing={4}>
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>Home</Typography>
-              <Typography variant="body1">About</Typography>
-              <Typography variant="body1">Our Initiatives</Typography>
-              <Typography variant="body1">Donations</Typography>
-              <Typography variant="body1">Contact Us</Typography>
-              <Typography variant="body1">Blog</Typography>
+              <Typography variant="body1" component={RouterLink} to="/" sx={{ fontWeight: 600, textDecoration: 'none', color: 'inherit' }}>Home</Typography>
+              <Typography variant="body1" component={RouterLink} to="/about" sx={{ textDecoration: 'none', color: 'inherit' }}>About</Typography>
+              <Typography variant="body1" component={RouterLink} to="/initiatives" sx={{ textDecoration: 'none', color: 'inherit' }}>Our Initiatives</Typography>
+              <Typography variant="body1" component={RouterLink} to="/donations" sx={{ textDecoration: 'none', color: 'inherit' }}>Donations</Typography>
+              <Typography variant="body1" component={RouterLink} to="/contact" sx={{ textDecoration: 'none', color: 'inherit' }}>Contact Us</Typography>
+              <Typography variant="body1" component={RouterLink} to="/blog" sx={{ textDecoration: 'none', color: 'inherit' }}>Blog</Typography>
             </Stack>
             <Button
               variant="contained"
+              component={RouterLink}
+              to="/donations"
               sx={{
                 bgcolor: '#4CAF50',
                 '&:hover': { bgcolor: '#2E7D32' },
                 borderRadius: '20px',
-                px: 3
+                px: 3,
+                textDecoration: 'none'
               }}
             >
               Donate
@@ -302,6 +305,71 @@ const Home = () => {
             </Box>
           ))}
         </Slider>
+      </Box>
+
+      {/* Video Section */}
+      <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: '#000' }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Box
+                sx={{
+                  position: 'relative',
+                  paddingTop: '56.25%', // 16:9 aspect ratio
+                  borderRadius: '20px',
+                  overflow: 'hidden',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                }}
+              >
+                <iframe
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                  }}
+                  src="https://www.youtube.com/embed/ishA6kry8nc"
+                  title="Food Waste Impact"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box sx={{ color: 'white', pl: { md: 6 } }}>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontWeight: 700,
+                    mb: 3,
+                    background: 'linear-gradient(45deg, #4CAF50, #81C784)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  See Our Impact
+                </Typography>
+                <Typography variant="h6" sx={{ mb: 4, color: 'rgba(255,255,255,0.9)' }}>
+                  Watch how our network of volunteers, businesses, and charities work together to reduce food waste and feed communities in need.
+                </Typography>
+                <Box
+                  sx={{
+                    p: 3,
+                    bgcolor: 'rgba(76, 175, 80, 0.1)',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(76, 175, 80, 0.2)',
+                  }}
+                >
+                  <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', fontStyle: 'italic' }}>
+                    "Every year, approximately 1.3 billion tonnes of food is wasted globally. Together, we can make a difference."
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
       </Box>
 
       {/* Our Endeavour Section */}
