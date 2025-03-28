@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Box,
@@ -11,339 +11,407 @@ import {
   Chip,
   Stack,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField
+  Paper,
+  Avatar,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Badge,
+  IconButton,
+  Container,
 } from '@mui/material';
+
 import {
-  TrendingUp as TrendingUpIcon,
-  LocalShipping as ShippingIcon,
   CheckCircle as CheckCircleIcon,
-  Schedule as ScheduleIcon
+  Assignment as AssignmentIcon,
+  LocalShipping as ShippingIcon,
+  Dashboard as DashboardIcon,
+  History as HistoryIcon,
+  EmojiEvents as AchievementsIcon,
+  Settings as SettingsIcon,
+  LocationOn as LocationIcon,
+  AccessTime as TimeIcon,
+  TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
+
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import '@mui/x-date-pickers/AdapterDateFns';
-import {
-  getFoodListingsStart,
-  getFoodListingsSuccess,
-  getFoodListingsFailure,
-  updateFoodListingStart,
-  updateFoodListingSuccess,
-  updateFoodListingFailure
-} from '../../store/slices/foodSlice';
-import axios from 'axios';
+import { styled } from '@mui/material/styles';
 
-const VolunteerDashboard = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
-  const { foodListings, loading } = useSelector((state) => state.food);
-  const [stats, setStats] = useState({
-    totalDeliveries: 0,
-    pendingDeliveries: 0,
-    completedDeliveries: 0,
-    inProgressDeliveries: 0
-  });
-  const [selectedDelivery, setSelectedDelivery] = useState(null);
-  const [deliveryDialog, setDeliveryDialog] = useState(false);
-  const [deliveryDetails, setDeliveryDetails] = useState({
-    estimatedTime: '',
-    notes: ''
-  });
+// -------------------------
+// Styled Components
+// -------------------------
+const DashboardContainer = styled(Box)(({ theme }) => ({
+  minHeight: '100vh',
+  background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%)',
+  padding: theme.spacing(3),
+}));
 
-  useEffect(() => {
-    const fetchFoodListings = async () => {
-      try {
-        dispatch(getFoodListingsStart());
-        const response = await axios.get('http://localhost:5000/api/food', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        dispatch(getFoodListingsSuccess(response.data));
-
-        // Calculate stats
-        const myDeliveries = response.data.filter(
-          (listing) => listing.volunteer === user.id
-        );
-        setStats({
-          totalDeliveries: myDeliveries.length,
-          pendingDeliveries: myDeliveries.filter(
-            (listing) => listing.status === 'claimed'
-          ).length,
-          inProgressDeliveries: myDeliveries.filter(
-            (listing) => listing.status === 'in_transit'
-          ).length,
-          completedDeliveries: myDeliveries.filter(
-            (listing) => listing.status === 'delivered'
-          ).length
-        });
-      } catch (error) {
-        dispatch(getFoodListingsFailure(error.message));
-      }
-    };
-
-    fetchFoodListings();
-  }, [dispatch, user.id]);
-
-  const handleAcceptDelivery = async (listing) => {
-    try {
-      dispatch(updateFoodListingStart());
-      const response = await axios.post(
-        `/api/food/${listing._id}/accept-delivery`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        }
-      );
-      dispatch(updateFoodListingSuccess(response.data));
-    } catch (error) {
-      dispatch(updateFoodListingFailure(error.message));
-    }
-  };
-
-  const handleUpdateDelivery = async () => {
-    try {
-      dispatch(updateFoodListingStart());
-      const response = await axios.patch(
-        `/api/food/${selectedDelivery._id}/update-delivery`,
-        deliveryDetails,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        }
-      );
-      dispatch(updateFoodListingSuccess(response.data));
-      setDeliveryDialog(false);
-      setSelectedDelivery(null);
-    } catch (error) {
-      dispatch(updateFoodListingFailure(error.message));
-    }
-  };
-
-  const StatCard = ({ title, value, icon, color }) => (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            mb: 2
-          }}
-        >
-          <Box
-            sx={{
-              p: 1,
-              borderRadius: 1,
-              bgcolor: `${color}.light`,
-              color: `${color}.main`,
-              mr: 2
-            }}
-          >
-            {icon}
-          </Box>
-          <Typography variant="h6" color="text.secondary">
-            {title}
-          </Typography>
-        </Box>
-        <Typography variant="h3" component="div">
-          {value}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
-
-  const DeliveryCard = ({ listing }) => (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          {listing.title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          {listing.description}
-        </Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-          <Chip
-            label={`${listing.quantity} ${listing.unit}`}
-            size="small"
-            color="primary"
-          />
-          <Chip label={listing.category} size="small" />
-          <Chip
-            label={listing.status.toUpperCase()}
-            size="small"
-            color={
-              listing.status === 'claimed'
-                ? 'warning'
-                : listing.status === 'in_transit'
-                ? 'info'
-                : 'success'
-            }
-          />
-        </Stack>
-        <Typography variant="body2" color="text.secondary">
-          Pickup: {listing.pickupAddress}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Delivery: {listing.deliveryAddress}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Scheduled: {format(new Date(listing.pickupTime), 'PPP')}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        {listing.status === 'claimed' ? (
-          <Button
-            size="small"
-            color="primary"
-            onClick={() => handleAcceptDelivery(listing)}
-          >
-            Accept Delivery
-          </Button>
-        ) : listing.status === 'in_transit' ? (
-          <Button
-            size="small"
-            color="primary"
-            onClick={() => {
-              setSelectedDelivery(listing);
-              setDeliveryDialog(true);
-            }}
-          >
-            Update Status
-          </Button>
-        ) : (
-          <Button
-            size="small"
-            onClick={() => navigate(`/food-listings/${listing._id}`)}
-          >
-            View Details
-          </Button>
-        )}
-      </CardActions>
-    </Card>
-  );
-
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '60vh'
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.98)',
+  backdropFilter: 'blur(20px)',
+  borderRadius: theme.spacing(3),
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+  padding: theme.spacing(3),
+  marginBottom: theme.spacing(4),
+  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: '0 12px 48px rgba(46, 125, 50, 0.12)',
   }
+}));
+
+const ProfileCard = styled(Paper)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.98)',
+  backdropFilter: 'blur(20px)',
+  borderRadius: theme.spacing(3),
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+  padding: theme.spacing(3),
+  marginBottom: theme.spacing(4),
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(3),
+}));
+
+const ImpactMetric = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2.5),
+  textAlign: 'center',
+  background: 'linear-gradient(135deg, rgba(46, 125, 50, 0.08) 0%, rgba(76, 175, 80, 0.08) 100%)',
+  borderRadius: theme.spacing(2),
+  border: '1px solid rgba(46, 125, 50, 0.12)',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+}));
+
+const StyledListItem = styled(ListItem)(({ theme }) => ({
+  borderRadius: theme.spacing(1),
+  marginBottom: theme.spacing(1),
+  '&.Mui-selected': {
+    backgroundColor: 'rgba(46, 125, 50, 0.08)',
+    '&:hover': {
+      backgroundColor: 'rgba(46, 125, 50, 0.12)',
+    }
+  }
+}));
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.98)',
+  backdropFilter: 'blur(20px)',
+  borderRadius: theme.spacing(2),
+  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: '0 8px 32px rgba(46, 125, 50, 0.12)',
+  }
+}));
+
+const StatsCard = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderRadius: theme.spacing(2),
+  background: 'linear-gradient(135deg, #2E7D32 0%, #388E3C 100%)',
+  color: 'white',
+  boxShadow: '0 4px 20px rgba(46, 125, 50, 0.25)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  height: '100%',
+}));
+
+const StatusBadge = styled(Chip)(({ theme, status }) => ({
+  fontWeight: 'bold',
+  ...(status === 'Available' && {
+    backgroundColor: theme.palette.success.light,
+    color: theme.palette.success.contrastText,
+  }),
+  ...(status === 'In Progress' && {
+    backgroundColor: theme.palette.warning.light,
+    color: theme.palette.warning.contrastText,
+  }),
+}));
+
+// -------------------------
+// Main Component
+// -------------------------
+const VolunteerDashboard = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [currentDate] = useState(new Date());
+  
+  // Mock data for deliveries
+  const [listings] = useState([
+    {
+      id: '1',
+      title: 'Fresh Vegetables',
+      status: 'Available',
+      quantity: 5,
+      description: 'Fresh vegetables from local farm',
+      location: 'Andheri East, Mumbai',
+      time: '2:30 PM - 4:00 PM',
+      distance: '3.2 km',
+      image: 'https://source.unsplash.com/random/300x200/?vegetables'
+    },
+    {
+      id: '2',
+      title: 'Canned Goods',
+      status: 'Available',
+      quantity: 12,
+      description: 'Assorted canned goods for distribution',
+      location: 'Bandra West, Mumbai',
+      time: '1:00 PM - 3:00 PM',
+      distance: '5.7 km',
+      image: 'https://source.unsplash.com/random/300x200/?canned-food'
+    },
+    {
+      id: '3',
+      title: 'Bread and Pastries',
+      status: 'In Progress',
+      quantity: 8,
+      description: 'Fresh bread and pastries from local bakery',
+      location: 'Dadar, Mumbai',
+      time: '10:00 AM - 12:00 PM',
+      distance: '2.1 km',
+      image: 'https://source.unsplash.com/random/300x200/?bread'
+    }
+  ]);
+
+  const handleAcceptDelivery = (listing) => {
+    console.log("Accepted delivery:", listing);
+  };
 
   return (
-    <Box sx={{ py: 3 }}>
-      <Typography variant="h4" sx={{ mb: 4 }}>
-        Volunteer Dashboard
-      </Typography>
+    <DashboardContainer>
+      <Container maxWidth="lg">
+        <ProfileCard>
+          <Avatar 
+            sx={{ 
+              width: 80, 
+              height: 80,
+              border: '3px solid #2E7D32',
+            }} 
+            src="https://source.unsplash.com/random/100x100/?portrait"
+          />
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography variant="h5" fontWeight="bold">Volunteer Name</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Mumbai, India
+            </Typography>
+            <Chip 
+              icon={<CheckCircleIcon />}
+              label="Verified Volunteer" 
+              size="small" 
+              color="success"
+              sx={{ mt: 1 }}
+            />
+          </Box>
+          <Box>
+            <Typography variant="h6" fontWeight="bold" color="primary">
+              {format(currentDate, 'EEEE, MMMM d')}
+            </Typography>
+          </Box>
+        </ProfileCard>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Deliveries"
-            value={stats.totalDeliveries}
-            icon={<ShippingIcon />}
-            color="primary"
-          />
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} md={8}>
+            <StyledPaper>
+              <Typography variant="h5" fontWeight="bold" gutterBottom>
+                Navigation
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={6} sm={3}>
+                  <Button 
+                    variant="outlined" 
+                    color="primary" 
+                    fullWidth
+                    startIcon={<DashboardIcon />}
+                    sx={{ 
+                      p: 1.5, 
+                      borderRadius: 2,
+                      justifyContent: 'flex-start',
+                      backgroundColor: 'rgba(46, 125, 50, 0.08)',
+                    }}
+                  >
+                    Dashboard
+                  </Button>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Button 
+                    variant="outlined" 
+                    color="primary" 
+                    fullWidth
+                    startIcon={<AssignmentIcon />}
+                    sx={{ p: 1.5, borderRadius: 2, justifyContent: 'flex-start' }}
+                  >
+                    Active
+                  </Button>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Button 
+                    variant="outlined" 
+                    color="primary" 
+                    fullWidth
+                    startIcon={<HistoryIcon />}
+                    sx={{ p: 1.5, borderRadius: 2, justifyContent: 'flex-start' }}
+                  >
+                    History
+                  </Button>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Button 
+                    variant="outlined" 
+                    color="primary" 
+                    fullWidth
+                    startIcon={<SettingsIcon />}
+                    sx={{ p: 1.5, borderRadius: 2, justifyContent: 'flex-start' }}
+                  >
+                    Settings
+                  </Button>
+                </Grid>
+              </Grid>
+            </StyledPaper>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ImpactMetric>
+              <TrendingUpIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
+              <Typography variant="h4" fontWeight="bold" color="success.main">32</Typography>
+              <Typography variant="body1" fontWeight="medium">Meals Delivered</Typography>
+              <Typography variant="caption" color="text.secondary">
+                You're making a difference!
+              </Typography>
+            </ImpactMetric>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Pending"
-            value={stats.pendingDeliveries}
-            icon={<ScheduleIcon />}
-            color="warning"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="In Progress"
-            value={stats.inProgressDeliveries}
-            icon={<TrendingUpIcon />}
-            color="info"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Completed"
-            value={stats.completedDeliveries}
-            icon={<CheckCircleIcon />}
-            color="success"
-          />
-        </Grid>
-      </Grid>
 
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        Available Deliveries
-      </Typography>
-
-      <Grid container spacing={3}>
-        {foodListings
-          .filter((listing) => listing.status === 'claimed' && !listing.volunteer)
-          .map((listing) => (
-            <Grid item xs={12} sm={6} md={4} key={listing._id}>
-              <DeliveryCard listing={listing} />
+        <StyledPaper>
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
+            Delivery Status
+          </Typography>
+          <Box sx={{ p: 2, mb: 3, bgcolor: 'rgba(46, 125, 50, 0.08)', borderRadius: 2, border: '1px dashed rgba(46, 125, 50, 0.3)' }}>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Avatar sx={{ bgcolor: 'primary.main' }}>
+                <TimeIcon />
+              </Avatar>
+              <Box>
+                <Typography variant="body1" fontWeight="medium">
+                  You currently have 3 active deliveries scheduled for today.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Next pickup: Dadar, Mumbai at 10:00 AM
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+          
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <StatsCard>
+                <Box>
+                  <Typography variant="body2" sx={{ opacity: 0.8 }}>Today's Deliveries</Typography>
+                  <Typography variant="h4" fontWeight="bold">3</Typography>
+                </Box>
+                <ShippingIcon sx={{ fontSize: 40, opacity: 0.8 }} />
+              </StatsCard>
             </Grid>
-          ))}
-      </Grid>
-
-      <Typography variant="h5" sx={{ mt: 6, mb: 3 }}>
-        Your Deliveries
-      </Typography>
-
-      <Grid container spacing={3}>
-        {foodListings
-          .filter((listing) => listing.volunteer === user.id)
-          .map((listing) => (
-            <Grid item xs={12} sm={6} md={4} key={listing._id}>
-              <DeliveryCard listing={listing} />
+            <Grid item xs={12} md={4}>
+              <StatsCard>
+                <Box>
+                  <Typography variant="body2" sx={{ opacity: 0.8 }}>Distance</Typography>
+                  <Typography variant="h4" fontWeight="bold">12 km</Typography>
+                </Box>
+                <LocationIcon sx={{ fontSize: 40, opacity: 0.8 }} />
+              </StatsCard>
             </Grid>
-          ))}
-      </Grid>
+            <Grid item xs={12} md={4}>
+              <StatsCard>
+                <Box>
+                  <Typography variant="body2" sx={{ opacity: 0.8 }}>Completion Rate</Typography>
+                  <Typography variant="h4" fontWeight="bold">98%</Typography>
+                </Box>
+                <CheckCircleIcon sx={{ fontSize: 40, opacity: 0.8 }} />
+              </StatsCard>
+            </Grid>
+          </Grid>
+        </StyledPaper>
 
-      <Dialog open={deliveryDialog} onClose={() => setDeliveryDialog(false)}>
-        <DialogTitle>Update Delivery Status</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="Estimated Delivery Time"
-            type="datetime-local"
-            value={deliveryDetails.estimatedTime}
-            onChange={(e) =>
-              setDeliveryDetails({
-                ...deliveryDetails,
-                estimatedTime: e.target.value
-              })
-            }
-            InputLabelProps={{ shrink: true }}
-            sx={{ mt: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Delivery Notes"
-            multiline
-            rows={4}
-            value={deliveryDetails.notes}
-            onChange={(e) =>
-              setDeliveryDetails({ ...deliveryDetails, notes: e.target.value })
-            }
-            sx={{ mt: 2 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeliveryDialog(false)}>Cancel</Button>
-          <Button onClick={handleUpdateDelivery} color="primary">
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+        <StyledPaper>
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
+            Available Deliveries
+          </Typography>
+          <Grid container spacing={3}>
+            {listings.map((listing) => (
+              <Grid item xs={12} md={4} key={listing.id}>
+                <StyledCard>
+                  <Box sx={{ 
+                    height: 140, 
+                    backgroundImage: `url(${listing.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    position: 'relative'
+                  }}>
+                    <Box sx={{ 
+                      position: 'absolute', 
+                      top: 10, 
+                      right: 10,
+                    }}>
+                      <StatusBadge 
+                        label={listing.status} 
+                        status={listing.status}
+                        size="small"
+                      />
+                    </Box>
+                  </Box>
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" fontWeight="bold">{listing.title}</Typography>
+                    <Stack direction="row" spacing={1} sx={{ my: 1 }}>
+                      <Chip 
+                        icon={<LocationIcon fontSize="small" />} 
+                        label={listing.distance} 
+                        size="small" 
+                        variant="outlined"
+                      />
+                      <Chip 
+                        icon={<TimeIcon fontSize="small" />} 
+                        label={listing.time} 
+                        size="small" 
+                        variant="outlined"
+                      />
+                    </Stack>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      {listing.description}
+                    </Typography>
+                    <Typography variant="body2" fontWeight="medium">
+                      <LocationIcon fontSize="small" sx={{ verticalAlign: 'middle', mr: 0.5 }} />
+                      {listing.location}
+                    </Typography>
+                  </CardContent>
+                  <CardActions sx={{ p: 2, pt: 0 }}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleAcceptDelivery(listing)}
+                      startIcon={<ShippingIcon />}
+                      sx={{ borderRadius: 8 }}
+                    >
+                      Accept Delivery
+                    </Button>
+                  </CardActions>
+                </StyledCard>
+              </Grid>
+            ))}
+          </Grid>
+        </StyledPaper>
+      </Container>
+    </DashboardContainer>
   );
 };
 

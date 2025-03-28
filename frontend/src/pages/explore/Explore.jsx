@@ -17,6 +17,7 @@ import { Search as SearchIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { format } from 'date-fns';
+import { isValid } from 'date-fns';
 
 const FoodListingCard = ({ listing, onClick }) => (
   <Card sx={{ height: '100%' }}>
@@ -43,7 +44,7 @@ const FoodListingCard = ({ listing, onClick }) => (
         />
       </Stack>
       <Typography variant="body2" color="text.secondary">
-        Expires: {format(new Date(listing.expiryDate), 'PPP')}
+        Expires: {listing.expiryDate ? (isValid(new Date(listing.expiryDate)) ? format(new Date(listing.expiryDate), 'PPP') : 'Invalid date') : 'No expiry date'}
       </Typography>
       <Typography variant="body2" color="text.secondary">
         Donor: {listing.donor?.organization?.name || 'Unknown'}

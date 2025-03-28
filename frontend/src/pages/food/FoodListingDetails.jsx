@@ -62,20 +62,28 @@ const FoodListingDetails = () => {
         return;
       }
       
-      // If not in store, fetch it from the API
       try {
         const response = await axios.get(`http://localhost:5000/api/food/${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
-        setListing(response.data);
+        if (response.data) {
+          setListing(response.data);
+        } else {
+          setError('Food listing not found');
+          navigate('/food-listings'); // Redirect to listings page if not found
+        }
       } catch (error) {
-        setError('Failed to load food listing details');
+        const errorMessage = error.response?.status === 404 
+          ? 'Food listing not found' 
+          : 'Failed to load food listing details';
+        setError(errorMessage);
         console.error('Error fetching food listing:', error);
+        setTimeout(() => navigate('/food-listings'), 3000); // Redirect after showing error
       }
     };
     
     fetchListing();
-  }, [id, foodListings]);
+  }, [id, foodListings, navigate]);
   
   const handleClaimDialogOpen = () => {
     setClaimDialog(true);

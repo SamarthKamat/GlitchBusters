@@ -1,4 +1,9 @@
 const mongoose = require('mongoose');
+const locationSchema = new mongoose.Schema({
+  address: String,
+  lat: Number,
+  lng: Number
+});
 
 const foodSchema = new mongoose.Schema({
   title: {
@@ -26,12 +31,12 @@ const foodSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Please specify the food category'],
-    enum: ['produce', 'dairy', 'bakery', 'meat', 'prepared', 'pantry', 'other']
+    enum: ['produce', 'dairy', 'bakery', 'meat', 'prepared', 'canned', 'dry', 'other']
   },
   temperature: {
     type: String,
     enum: ['room', 'refrigerated', 'frozen'],
-    required: [true, 'Please specify storage temperature']
+    default: 'room'
   },
   allergens: [{
     type: String,
@@ -44,7 +49,7 @@ const foodSchema = new mongoose.Schema({
   donor: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    required: [true, 'Food listing must belong to a business']
+    required: [true, 'Food listing must belong to a donor']
   },
   status: {
     type: String,
@@ -79,6 +84,10 @@ const foodSchema = new mongoose.Schema({
     transportationSafe: Boolean
   },
   photos: [String],
+  location: {
+    type: locationSchema,
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

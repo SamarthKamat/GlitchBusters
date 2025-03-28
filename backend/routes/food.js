@@ -3,25 +3,73 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Food = require('../models/Food');
 const User = require('../models/User');
-const protect = require('../routes/auth'); // Ensure middleware is imported
+const protect = require('../middleware/auth'); // Authentication middleware
+
+// Get socket.io instance
+const getIo = (req) => {
+  const io = req.app.get('io');
+  if (!io) {
+    console.warn('Socket.io instance not found');
+    return null;
+  }
+  return io;
+}
 
 // Create a new food listing
 router.post('/', protect, async (req, res) => {
   try {
-    if (req.user.role !== 'business') {
+    if (!req.user || req.user.role !== 'business') {
       return res.status(403).json({ message: 'Only businesses can create food listings' });
     }
+    console.log(req.body);
+    const { location, expiryDate, pickupTime, safetyInfo, notes, ...rest } = req.body;
 
+    // Validate required fields
+    if (!location || !location.lat || !location.lng) {
+      return res.status(400).json({ message: 'Valid location coordinates are required' });
+    }
+
+    // Create food listing with all fields from the frontend
     const foodListing = new Food({
-      ...req.body,
-      donor: req.user.id
+      ...rest,
+      location: {
+        lat: location.lat,
+        lng: location.lng
+      },
+      expiryDate: new Date(expiryDate),
+      pickupDetails: {
+        availableTime: {
+          start: new Date(pickupTime),
+          end: new Date(pickupTime)
+        }
+      },
+      safetyChecklist: {
+        temperatureChecked: false,
+        packagingIntact: false,
+        labelingComplete: false,
+        transportationSafe: false
+      },
+      donor: req.user.id,
+      status: 'available'
     });
 
+    if (safetyInfo) {
+      foodListing.safetyChecklist = {
+        ...foodListing.safetyChecklist,
+        notes: safetyInfo
+      };
+    }
+
     await foodListing.save();
-    req.app.get('io').emit('newFoodListing', foodListing);
+    
+    const io = getIo(req);
+    if (io) {
+      io.emit('newFoodListing', foodListing);
+    }
 
     res.status(201).json(foodListing);
   } catch (error) {
+    console.error('Food creation error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -166,7 +214,7 @@ router.get('/stats/impact', protect, async (req, res) => {
 // Get listings by donor
 router.get('/my-listings', protect, async (req, res) => {
   try {
-    if (req.user.role !== 'business') {
+    if (!req.user || req.user.role !== 'business') {
       return res.status(403).json({ message: 'Access denied' });
     }
 
@@ -184,6 +232,8 @@ router.get('/my-listings', protect, async (req, res) => {
 // Update a food listing
 router.put('/:id', protect, async (req, res) => {
   try {
+    const { location, ...rest } = req.body;
+
     const foodListing = await Food.findById(req.params.id);
 
     if (!foodListing) {
@@ -198,9 +248,13 @@ router.put('/:id', protect, async (req, res) => {
       return res.status(400).json({ message: 'Cannot update claimed or delivered listings' });
     }
 
+    if (location && (!location.lat || !location.lng)) {
+      return res.status(400).json({ message: 'Invalid location data' });
+    }
+
     const updatedListing = await Food.findByIdAndUpdate(
       req.params.id,
-      { ...req.body },
+      { ...rest, ...(location && { location }) },
       { new: true }
     );
 

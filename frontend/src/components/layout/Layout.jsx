@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   AppBar,
   Box,
+  Button,
   CssBaseline,
   Divider,
   Drawer,
@@ -37,14 +38,60 @@ import { logout } from '../../store/slices/authSlice';
 import ThemeToggle from './ThemeToggle';
 import { useThemeContext } from '../../theme/ThemeContext';
 import { Explore as ExploreIcon } from '@mui/icons-material';
+import { Client } from "@gradio/client";
+import {
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+} from '@mui/material';
+import { Chat as ChatIcon } from '@mui/icons-material';
 
 const drawerWidth = 280;
 
+// First, move the client initialization inside the component and add new state
 const Layout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationAnchor, setNotificationAnchor] = useState(null);
-  
+  const [gradioResult, setGradioResult] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessage, setChatMessage] = useState('');
+  const [chatResponse, setChatResponse] = useState('');
+
+  // Function to fetch food listings alerts
+  const fetchFoodListings = async () => {
+    try {
+      setIsLoading(true);
+      const client = await Client.connect("https://e26c0a78286954790a.gradio.live/");
+      const result = await client.predict("/view_listings_interface", {});
+      const listings = result?.data ? JSON.parse(result.data) : [];
+      setGradioResult(listings);
+      // Update notification count
+      dispatch(setNotificationCount(listings.length));
+    } catch (error) {
+      console.error('Error fetching food listings:', error);
+      setGradioResult([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle notification menu open
+  const handleNotificationOpen = async (event) => {
+    setNotificationAnchor(event.currentTarget);
+    await fetchFoodListings();
+  };
+
+  // Fetch food listings periodically
+  useEffect(() => {
+    fetchFoodListings();
+    const interval = setInterval(fetchFoodListings, 60000); // Fetch every minute
+    return () => clearInterval(interval);
+  }, []);
   const { user } = useSelector((state) => state.auth);
   const { notificationCount, alerts } = useSelector((state) => state.alert);
   const navigate = useNavigate();
@@ -52,6 +99,9 @@ const Layout = () => {
   const location = useLocation();
   const { mode } = useThemeContext();
   
+
+
+
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -65,12 +115,34 @@ const Layout = () => {
     setAnchorEl(null);
   };
 
-  const handleNotificationOpen = (event) => {
-    setNotificationAnchor(event.currentTarget);
-  };
-
   const handleNotificationClose = () => {
     setNotificationAnchor(null);
+  };
+
+  const handleChatOpen = () => {
+    setChatOpen(true);
+  };
+
+  const handleChatClose = () => {
+    setChatOpen(false);
+    setChatMessage('');
+    setChatResponse('');
+  };
+
+  const handleChatSubmit = async () => {
+    try {
+      setIsLoading(true);
+      const client = await Client.connect("https://e2763c87228d3ac3c3.gradio.live/");
+      const result = await client.predict("/chat", { 
+        message: chatMessage 
+      });
+      setChatResponse(result.data);
+    } catch (error) {
+      console.error('Error sending chat message:', error);
+      setChatResponse('Sorry, there was an error processing your message.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -242,6 +314,9 @@ const Layout = () => {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
+            <IconButton color="inherit" onClick={handleChatOpen} sx={{ mx: 1 }}>
+              <ChatIcon />
+            </IconButton>
             <IconButton
               onClick={handleProfileMenuOpen}
               sx={{ ml: 1 }}
@@ -345,12 +420,41 @@ const Layout = () => {
             sx: { width: 360 }
           }}
         >
-          {alerts.length > 0 ? (
-            alerts.map((alert) => (
-              <MenuItem key={alert.id}>
-                <Typography variant="body2">{alert.message}</Typography>
-              </MenuItem>
-            ))
+          {isLoading ? (
+            <MenuItem>
+              <CircularProgress size={20} sx={{ mr: 1 }} />
+              <Typography variant="body2">Loading food listings...</Typography>
+            </MenuItem>
+          ) : gradioResult && Array.isArray(gradioResult) ? (
+            <>
+              {gradioResult.map((listing, index) => (
+                <MenuItem key={index} onClick={() => navigate(`/food-listings/${listing.id}`)}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                      {listing.source}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                      {listing.description}
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                      <Typography variant="caption" color="primary">
+                        Qty: {listing.quantity}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {listing.pickup}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </MenuItem>
+              ))}
+              {gradioResult.length === 0 && (
+                <MenuItem>
+                  <Typography variant="body2" color="text.secondary">
+                    No new food listings available
+                  </Typography>
+                </MenuItem>
+              )}
+            </>
           ) : (
             <MenuItem>
               <Typography variant="body2" color="text.secondary">
@@ -359,6 +463,47 @@ const Layout = () => {
             </MenuItem>
           )}
         </Menu>
+
+        {/* Chat Dialog */}
+        <Dialog
+          open={chatOpen}
+          onClose={handleChatClose}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>Chat with AI Assistant</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Type your message"
+              type="text"
+              fullWidth
+              multiline
+              rows={3}
+              value={chatMessage}
+              onChange={(e) => setChatMessage(e.target.value)}
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+            {chatResponse && (
+              <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+                <Typography variant="body1">{chatResponse}</Typography>
+              </Box>
+            )}
+            {isLoading && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                <CircularProgress />
+              </Box>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleChatClose}>Cancel</Button>
+            <Button onClick={handleChatSubmit} variant="contained" disabled={!chatMessage || isLoading}>
+              Send
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     );
 };

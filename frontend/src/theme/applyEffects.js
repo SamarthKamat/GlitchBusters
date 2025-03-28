@@ -54,3 +54,5 @@ export const applySparkleEffect = () => {
   };
   
   export default initializeEffects;
+
+  

@@ -950,7 +950,7 @@ const Home = () => {
                 </IconButton>
                 <IconButton 
                   href={socialLinks.linkedin} 
-                  target="_blank" zz
+                  target="_blank"
                   rel="noopener noreferrer"
                   sx={{ color: 'white', '&:hover': { color: '#0077B5' } }}
                 >

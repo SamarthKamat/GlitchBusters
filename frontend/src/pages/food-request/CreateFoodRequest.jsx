@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -15,8 +16,24 @@ import {
 import axios from 'axios';
 import { GoogleMap, LoadScript, Marker, Autocomplete } from '@react-google-maps/api';
 
+export const units = [
+  { value: 'kg', label: 'Kilograms (kg)' },
+  { value: 'lbs', label: 'Lbs' },
+  { value: 'pieces', label: 'Pieces' },
+  { value: 'servings', label: 'Servings' },
+  { value: 'boxes', label: 'Boxes' }
+];
+
 const CreateFoodRequest = () => {
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!user || user.role !== 'charity') {
+      navigate('/food-requests');
+    }
+  }, [user, navigate]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [location, setLocation] = useState({ lat: null, lng: null });
@@ -62,16 +79,27 @@ const CreateFoodRequest = () => {
     setLoading(true);
     setError('');
 
+    if (!location.lat || !location.lng) {
+      setError('Please select a location on the map');
+      setLoading(false);
+      return;
+    }
+
     const requestData = {
       ...formData,
-      location,
+      location: {
+        lat: location.lat,
+        lng: location.lng
+      },
+      quantityRequested: parseInt(formData.quantityRequested),
+      status: 'pending'
     };
 
     try {
-      await axios.post('http://localhost:5000/api/charity_request/create_request', requestData, {
+      await axios.post('http://localhost:5000/api/food', requestData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      navigate('/food-requests');
+      navigate('/food-requests')
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create request');
     } finally {
@@ -140,11 +168,11 @@ const CreateFoodRequest = () => {
                 onChange={handleChange}
                 required
               >
-                <MenuItem value="kg">Kilograms (kg)</MenuItem>
-                <MenuItem value="lbs">Lbs</MenuItem>
-                <MenuItem value="pieces">Pieces</MenuItem>
-                <MenuItem value="servings">Servings</MenuItem>
-                <MenuItem value="boxes">Boxes</MenuItem>
+                {units.map((unit) => (
+                  <MenuItem key={unit.value} value={unit.value}>
+                    {unit.label}
+                  </MenuItem>
+                ))}
               </TextField>
             </Grid>
             <Grid item xs={12}>

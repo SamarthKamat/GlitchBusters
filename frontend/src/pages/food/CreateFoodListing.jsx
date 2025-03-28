@@ -29,6 +29,10 @@ import {
   createFoodListingFailure
 } from '../../store/slices/foodSlice';
 import axios from 'axios';
+import { GoogleMap, LoadScript, Marker, Autocomplete } from '@react-google-maps/api';
+import { units } from '../food-request/CreateFoodRequest';
+
+const libraries = ['places']; // Define this outside the component
 
 const CreateFoodListing = () => {
   const navigate = useNavigate();
@@ -44,12 +48,13 @@ const CreateFoodListing = () => {
     unit: 'kg',
     expiryDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
     pickupTime: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
-    pickupAddress: user?.organization?.address || '',
     safetyInfo: '',
     notes: ''
   });
 
   const [formErrors, setFormErrors] = useState({});
+  const [location, setLocation] = useState({ lat: null, lng: null });
+  const [autocomplete, setAutocomplete] = useState(null);
 
   const categories = [
     { value: 'produce', label: 'Produce' },
@@ -59,18 +64,6 @@ const CreateFoodListing = () => {
     { value: 'prepared', label: 'Prepared Food' },
     { value: 'canned', label: 'Canned Goods' },
     { value: 'dry', label: 'Dry Goods' }
-  ];
-
-  const units = [
-    { value: 'kg', label: 'Kilograms (kg)' },
-    { value: 'g', label: 'Grams (g)' },
-    { value: 'lb', label: 'Pounds (lb)' },
-    { value: 'oz', label: 'Ounces (oz)' },
-    { value: 'l', label: 'Liters (L)' },
-    { value: 'ml', label: 'Milliliters (mL)' },
-    { value: 'servings', label: 'Servings' },
-    { value: 'items', label: 'Items' },
-    { value: 'packages', label: 'Packages' }
   ];
 
   const handleChange = (e) => {
@@ -102,6 +95,26 @@ const CreateFoodListing = () => {
     }
   };
 
+  const handleAutocompleteLoad = (auto) => {
+    setAutocomplete(auto);
+  };
+
+  const handlePlaceChanged = () => {
+    if (autocomplete) {
+      const place = autocomplete.getPlace();
+      if (place.geometry) {
+        setLocation({
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        });
+      }
+    }
+  };
+
+  const handleMapClick = (e) => {
+    setLocation({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+  };
+
   const validateForm = () => {
     const errors = {};
 
@@ -113,7 +126,6 @@ const CreateFoodListing = () => {
       errors.quantity = 'Quantity must be a positive number';
     }
     if (!formData.unit) errors.unit = 'Unit is required';
-    if (!formData.pickupAddress.trim()) errors.pickupAddress = 'Pickup address is required';
     
     // Validate dates
     const now = new Date();
@@ -127,6 +139,10 @@ const CreateFoodListing = () => {
       errors.pickupTime = 'Pickup time is required';
     } else if (formData.pickupTime < now) {
       errors.pickupTime = 'Pickup time cannot be in the past';
+    }
+
+    if (!location.lat || !location.lng) {
+      errors.location = 'Location is required';
     }
     
     setFormErrors(errors);
@@ -145,6 +161,8 @@ const CreateFoodListing = () => {
         'http://localhost:5000/api/food',
         {
           ...formData,
+          location,
+          pickupAddress: `Latitude: ${location.lat}, Longitude: ${location.lng}`, // Use map location for pickup address
           expiryDate: format(formData.expiryDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
           pickupTime: format(formData.pickupTime, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
         },
@@ -322,16 +340,43 @@ const CreateFoodListing = () => {
             </Grid>
             
             <Grid item xs={12}>
-              <TextField
-                name="pickupAddress"
-                label="Pickup Address"
-                fullWidth
-                value={formData.pickupAddress}
-                onChange={handleChange}
-                error={!!formErrors.pickupAddress}
-                helperText={formErrors.pickupAddress}
-                required
-              />
+              <Typography variant="h6" gutterBottom>
+                Select Location
+              </Typography>
+              <LoadScript
+                googleMapsApiKey="AIzaSyCOcIVYH1tYXH0L0ryQVcldisMyRNWrDYA"
+                libraries={libraries} // Use the constant here
+              >
+                <Autocomplete
+                  onLoad={handleAutocompleteLoad}
+                  onPlaceChanged={handlePlaceChanged}
+                >
+                  <TextField
+                    fullWidth
+                    label="Search Location"
+                    placeholder="Type a location"
+                    variant="outlined"
+                  />
+                </Autocomplete>
+                <GoogleMap
+                  mapContainerStyle={{ height: '400px', width: '100%' }}
+                  center={location.lat && location.lng ? location : { lat: 0, lng: 0 }}
+                  zoom={location.lat && location.lng ? 15 : 2}
+                  onClick={handleMapClick}
+                >
+                  {location.lat && location.lng && <Marker position={location} />}
+                </GoogleMap>
+              </LoadScript>
+              {location.lat && location.lng && (
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                  Selected Location: Latitude {location.lat}, Longitude {location.lng}
+                </Typography>
+              )}
+              {formErrors.location && (
+                <Typography variant="body2" color="error">
+                  {formErrors.location}
+                </Typography>
+              )}
             </Grid>
             
             <Grid item xs={12}>

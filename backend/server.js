@@ -48,6 +48,9 @@ io.on('connection', (socket) => {
   });
 });
 
+// Make io instance available to routes
+app.set('io', io);
+
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/food', require('./routes/food'));
