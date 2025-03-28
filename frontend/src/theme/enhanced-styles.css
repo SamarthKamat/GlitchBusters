@@ -1,0 +1,193 @@
+/* Enhanced UI Styles - Special Effects and Animations */
+
+/* Make all text elements bold */
+h1, h2, h3, h4, h5, h6, p, span, div, button, a, li, label, input, textarea, select, option {
+    font-weight: bold !important;
+  }
+  
+  /* Shiny box effect for cards and containers */
+  .card, .MuiCard-root, .MuiPaper-root, .feature-card, .stat-card, .testimonial-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Shine effect on hover */
+  .card::before, .MuiCard-root::before, .MuiPaper-root::before, .feature-card::before, .stat-card::before, .testimonial-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    transition: transform 0.7s;
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .card:hover::before, .MuiCard-root:hover::before, .MuiPaper-root:hover::before, .feature-card:hover::before, .stat-card:hover::before, .testimonial-card:hover::before {
+    opacity: 1;
+    transform: rotate(30deg) translate(150%, -150%);
+  }
+  
+  /* Social Media Icons Glow Effect */
+  .social-icon {
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    padding: 6px;
+    margin: 0 4px;
+  }
+  
+  .social-icon:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 4px rgba(76, 175, 80, 0.4));
+  }
+  
+  /* Sparkle animation for buttons and interactive elements */
+  .btn-primary, .btn-secondary, .MuiButton-root, .MuiIconButton-root {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+    padding: 6px 12px;
+    height: auto;
+    min-height: 36px;
+  }
+  
+  .btn-primary::after, .btn-secondary::after, .MuiButton-root::after, .MuiIconButton-root::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+    z-index: -1;
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+  
+  .btn-primary:hover::after, .btn-secondary:hover::after, .MuiButton-root:hover::after, .MuiIconButton-root:hover::after {
+    transform: translateX(100%);
+  }
+  
+  /* Glow effect for important elements */
+  .section-title, .MuiTypography-h1, .MuiTypography-h2, .MuiTypography-h3 {
+    text-shadow: 0 0 10px rgba(76, 175, 80, 0.3), 0 0 20px rgba(76, 175, 80, 0.2), 0 0 30px rgba(76, 175, 80, 0.1);
+  }
+  
+  /* Floating animation for cards */
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  .feature-card, .stat-card, .testimonial-card, .MuiCard-root {
+    animation: float 5s ease-in-out infinite;
+  }
+  
+  /* Staggered animation for card groups */
+  .MuiGrid-container > .MuiGrid-item:nth-child(1) .MuiCard-root,
+  .MuiGrid-container > .MuiGrid-item:nth-child(1) .feature-card,
+  .MuiGrid-container > .MuiGrid-item:nth-child(1) .stat-card {
+    animation-delay: 0s;
+  }
+  
+  .MuiGrid-container > .MuiGrid-item:nth-child(2) .MuiCard-root,
+  .MuiGrid-container > .MuiGrid-item:nth-child(2) .feature-card,
+  .MuiGrid-container > .MuiGrid-item:nth-child(2) .stat-card {
+    animation-delay: 0.2s;
+  }
+  
+  .MuiGrid-container > .MuiGrid-item:nth-child(3) .MuiCard-root,
+  .MuiGrid-container > .MuiGrid-item:nth-child(3) .feature-card,
+  .MuiGrid-container > .MuiGrid-item:nth-child(3) .stat-card {
+    animation-delay: 0.4s;
+  }
+  
+  .MuiGrid-container > .MuiGrid-item:nth-child(4) .MuiCard-root,
+  .MuiGrid-container > .MuiGrid-item:nth-child(4) .feature-card,
+  .MuiGrid-container > .MuiGrid-item:nth-child(4) .stat-card {
+    animation-delay: 0.6s;
+  }
+  
+  /* Sparkle effect for icons */
+  @keyframes sparkle {
+    0% { filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0)); }
+    50% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7)); }
+    100% { filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0)); }
+  }
+  
+  .MuiSvgIcon-root, .feature-icon {
+    animation: sparkle 2s infinite;
+  }
+  
+  /* Gradient text effect */
+  .gradient-text, .hero-content h1, .hero-content h2, .section-title {
+    background: linear-gradient(45deg, #4CAF50, #FF9800);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    display: inline-block;
+  }
+  
+  /* Pulsing effect for call-to-action buttons */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  .btn-primary, .MuiButton-containedPrimary {
+    animation: pulse 2s infinite;
+  }
+  
+  /* 3D effect for cards */
+  .card, .MuiCard-root, .MuiPaper-root {
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover, .MuiCard-root:hover, .MuiPaper-root:hover {
+    transform: translateY(-5px) scale(1.02);
+  }
+  
+  /* Special border effect */
+  .special-border, .MuiCard-root, .feature-card, .stat-card, .testimonial-card {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+  
+  .special-border::before, .MuiCard-root::before, .feature-card::before, .stat-card::before, .testimonial-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: -1px;
+    border-radius: inherit;
+    background: linear-gradient(45deg, #4CAF50, #FF9800);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .special-border:hover::before, .MuiCard-root:hover::before, .feature-card:hover::before, .stat-card:hover::before, .testimonial-card:hover::before {
+    opacity: 1;
+  }

@@ -109,8 +109,8 @@ const Explore = () => {
   };
 
   const handleCardClick = (type, id) => {
-    if (type === 'food') navigate(`/food/${id}`);
-    else if (type === 'charity') navigate(`/food-request/${id}`);
+    if (type === 'food') navigate(`/food-listings/${id}`);
+    else if (type === 'charity') navigate(`/food-requests/${id}`);
     else if (type === 'user') navigate(`/organization/${id}`);
   };
 

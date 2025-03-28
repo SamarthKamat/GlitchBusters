@@ -171,52 +171,52 @@ const Home = () => {
   return (
     <Box sx={{ overflow: 'hidden' }}>
       {/* Header with contact info */}
-      <Box sx={{ bgcolor: '#4CAF50', color: 'white', py: 1 }}>
+      <Box sx={{ bgcolor: '#4CAF50', color: 'white', py: 2 }}>
         <Container maxWidth="lg">
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" spacing={3}>
               <Stack direction="row" spacing={1} alignItems="center">
-                <EmailIcon fontSize="small" />
-                <Typography variant="body2">contact@glitchbusters.org</Typography>
+                <EmailIcon fontSize="medium" />
+                <Typography variant="body1">contact@glitchbusters.org</Typography>
               </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
-                <PhoneIcon fontSize="small" />
-                <Typography variant="body2">+1 800 123 4567</Typography>
+                <PhoneIcon fontSize="medium" />
+                <Typography variant="body1">+91 7709086986</Typography>
               </Stack>
             </Stack>
 
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" spacing={3}>
               <IconButton 
                 href={socialLinks.facebook} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                sx={{ color: 'white', p: 0 }}
+                sx={{ color: 'white', p: 1 }}
               >
-                <FacebookIcon fontSize="small" />
+                <FacebookIcon fontSize="medium" />
               </IconButton>
               <IconButton 
                 href={socialLinks.linkedin} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                sx={{ color: 'white', p: 0 }}
+                sx={{ color: 'white', p: 1 }}
               >
-                <LinkedInIcon fontSize="small" />
+                <LinkedInIcon fontSize="medium" />
               </IconButton>
               <IconButton 
                 href={socialLinks.instagram} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                sx={{ color: 'white', p: 0 }}
+                sx={{ color: 'white', p: 1 }}
               >
-                <InstagramIcon fontSize="small" />
+                <InstagramIcon fontSize="medium" />
               </IconButton>
               <IconButton 
                 href={socialLinks.youtube} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                sx={{ color: 'white', p: 0 }}
+                sx={{ color: 'white', p: 1 }}
               >
-                <YouTubeIcon fontSize="small" />
+                <YouTubeIcon fontSize="medium" />
               </IconButton>
             </Stack>
           </Stack>
@@ -224,7 +224,7 @@ const Home = () => {
       </Box>
 
       {/* Navigation */}
-      <Box sx={{ bgcolor: 'white', py: 2, boxShadow: 1 }}>
+      <Box sx={{ bgcolor: '#4CAF50', color: 'white', py: 2, mb: 2 }}>
         <Container maxWidth="lg">
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography variant="h5" component="div" sx={{ fontWeight: 700, color: '#2E7D32' }}>
@@ -944,7 +944,14 @@ const Home = () => {
                   href={socialLinks.facebook} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  sx={{ color: 'white', '&:hover': { color: '#4267B2' } }}
+                  className="social-icon"
+                  sx={{ 
+                    color: 'white', 
+                    '&:hover': { 
+                      color: '#4267B2',
+                      transform: 'scale(1.1)'
+                    }
+                  }}
                 >
                   <FacebookIcon />
                 </IconButton>
@@ -952,7 +959,14 @@ const Home = () => {
                   href={socialLinks.linkedin} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  sx={{ color: 'white', '&:hover': { color: '#0077B5' } }}
+                  className="social-icon"
+                  sx={{ 
+                    color: 'white', 
+                    '&:hover': { 
+                      color: '#0077B5',
+                      transform: 'scale(1.1)'
+                    }
+                  }}
                 >
                   <LinkedInIcon />
                 </IconButton>
@@ -960,7 +974,14 @@ const Home = () => {
                   href={socialLinks.instagram} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  sx={{ color: 'white', '&:hover': { color: '#E4405F' } }}
+                  className="social-icon"
+                  sx={{ 
+                    color: 'white', 
+                    '&:hover': { 
+                      color: '#E4405F',
+                      transform: 'scale(1.1)'
+                    }
+                  }}
                 >
                   <InstagramIcon />
                 </IconButton>
@@ -968,7 +989,14 @@ const Home = () => {
                   href={socialLinks.youtube} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  sx={{ color: 'white', '&:hover': { color: '#FF0000' } }}
+                  className="social-icon"
+                  sx={{ 
+                    color: 'white', 
+                    '&:hover': { 
+                      color: '#FF0000',
+                      transform: 'scale(1.1)'
+                    }
+                  }}
                 >
                   <YouTubeIcon />
                 </IconButton>
@@ -976,7 +1004,14 @@ const Home = () => {
                   href="https://wa.me/18001234567" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  sx={{ color: 'white', '&:hover': { color: '#25D366' } }}
+                  className="social-icon"
+                  sx={{ 
+                    color: 'white', 
+                    '&:hover': { 
+                      color: '#25D366',
+                      transform: 'scale(1.1)'
+                    }
+                  }}
                 >
                   <WhatsAppIcon />
                 </IconButton>

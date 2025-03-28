@@ -278,12 +278,16 @@ const CharityDashboard = () => {
       </Grid>
 
       <Typography variant="h5" sx={{ mb: 3 }}>
-        Available Food Listings
+        History of Food Requests
       </Typography>
 
       <Grid container spacing={3}>
         {foodListings
-          .filter((listing) => listing.status === 'available')
+          .filter(
+            (listing) =>
+              listing.claimedBy === user.id &&
+              (listing.status === 'delivered' || listing.status === 'cancelled')
+          )
           .map((listing) => (
             <Grid item xs={12} sm={6} md={4} key={listing._id}>
               <FoodListingCard listing={listing} />
@@ -300,6 +304,24 @@ const CharityDashboard = () => {
           .filter(
             (listing) =>
               listing.claimedBy === user.id && listing.status !== 'available'
+          )
+          .map((listing) => (
+            <Grid item xs={12} sm={6} md={4} key={listing._id}>
+              <FoodListingCard listing={listing} />
+            </Grid>
+          ))}
+      </Grid>
+
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        Current Food Requests
+      </Typography>
+
+      <Grid container spacing={3}>
+        {foodListings
+          .filter(
+            (listing) =>
+              listing.claimedBy === user.id &&
+              (listing.status === 'claimed' || listing.status === 'in-progress')
           )
           .map((listing) => (
             <Grid item xs={12} sm={6} md={4} key={listing._id}>
