@@ -60,6 +60,7 @@ app.use('/api/charity_request', require('./routes/charity_request/create_request
 app.use('/api/charity_request', require('./routes/charity_request/get_requests'));
 app.use('/api/charity_request', require('./routes/charity_request/donate'));
 app.use('/api/charity_request', require('./routes/charity_request/change_requests'));
+app.use('/api/charity_request', require('./routes/charity_request/history_and_claimed'));
 
 
 

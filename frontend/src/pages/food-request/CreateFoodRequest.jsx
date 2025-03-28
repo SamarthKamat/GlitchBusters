@@ -13,11 +13,14 @@ import {
   Alert
 } from '@mui/material';
 import axios from 'axios';
+import { GoogleMap, LoadScript, Marker, Autocomplete } from '@react-google-maps/api';
 
 const CreateFoodRequest = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [location, setLocation] = useState({ lat: null, lng: null });
+  const [autocomplete, setAutocomplete] = useState(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -34,13 +37,38 @@ const CreateFoodRequest = () => {
     });
   };
 
+  const handleMapClick = (e) => {
+    setLocation({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+  };
+
+  const handleAutocompleteLoad = (auto) => {
+    setAutocomplete(auto);
+  };
+
+  const handlePlaceChanged = () => {
+    if (autocomplete) {
+      const place = autocomplete.getPlace();
+      if (place.geometry) {
+        setLocation({
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        });
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    const requestData = {
+      ...formData,
+      location,
+    };
+
     try {
-      await axios.post('http://localhost:5000/api/charity_request/create_request', formData, {
+      await axios.post('http://localhost:5000/api/charity_request/create_request', requestData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       navigate('/food-requests');
@@ -113,9 +141,10 @@ const CreateFoodRequest = () => {
                 required
               >
                 <MenuItem value="kg">Kilograms (kg)</MenuItem>
-                <MenuItem value="items">Items</MenuItem>
+                <MenuItem value="lbs">Lbs</MenuItem>
+                <MenuItem value="pieces">Pieces</MenuItem>
+                <MenuItem value="servings">Servings</MenuItem>
                 <MenuItem value="boxes">Boxes</MenuItem>
-                <MenuItem value="meals">Meals</MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12}>
@@ -128,6 +157,40 @@ const CreateFoodRequest = () => {
                 onChange={handleChange}
                 required
               />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Select Location
+              </Typography>
+              <LoadScript
+                googleMapsApiKey="AIzaSyCOcIVYH1tYXH0L0ryQVcldisMyRNWrDYA"
+                libraries={["places"]} // Add this line
+              >
+                <Autocomplete
+                  onLoad={handleAutocompleteLoad}
+                  onPlaceChanged={handlePlaceChanged}
+                >
+                  <TextField
+                    fullWidth
+                    label="Search Location"
+                    placeholder="Type a location"
+                    variant="outlined"
+                  />
+                </Autocomplete>
+                <GoogleMap
+                  mapContainerStyle={{ height: '400px', width: '100%' }}
+                  center={location.lat && location.lng ? location : { lat: 0, lng: 0 }}
+                  zoom={location.lat && location.lng ? 15 : 2}
+                  onClick={handleMapClick}
+                >
+                  {location.lat && location.lng && <Marker position={location} />}
+                </GoogleMap>
+              </LoadScript>
+              {location.lat && location.lng && (
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                  Selected Location: Latitude {location.lat}, Longitude {location.lng}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12}>
               <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>

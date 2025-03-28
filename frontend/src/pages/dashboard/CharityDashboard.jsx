@@ -55,38 +55,43 @@ const CharityDashboard = () => {
   });
 
   useEffect(() => {
-    const fetchFoodListings = async () => {
+    const fetchCharityData = async () => {
       try {
         dispatch(getFoodListingsStart());
-        const response = await axios.get('http://localhost:5000/api/food', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        dispatch(getFoodListingsSuccess(response.data));
+        const response = await axios.get(
+          'http://localhost:5000/api/charity_request/history_and_claimed',
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          }
+        );
+
+        const { historyRequests, currentRequests, claimedDonations } = response.data;
+
+        // Combine all food listings for rendering
+        const allFoodListings = [...historyRequests, ...currentRequests];
+        dispatch(getFoodListingsSuccess(allFoodListings));
 
         // Calculate stats
-        const claimedListings = response.data.filter(
-          (listing) => listing.claimedBy === user.id
-        );
         setStats({
-          totalClaimed: claimedListings.length,
-          pendingPickup: claimedListings.filter(
+          totalClaimed: claimedDonations.length,
+          pendingPickup: currentRequests.filter(
             (listing) => listing.status === 'claimed'
           ).length,
-          delivered: claimedListings.filter(
+          delivered: historyRequests.filter(
             (listing) => listing.status === 'delivered'
           ).length,
-          totalQuantity: claimedListings.reduce(
-            (acc, listing) => acc + listing.quantity,
+          totalQuantity: claimedDonations.reduce(
+            (acc, donation) => acc + donation.quantityFulfilled,
             0
-          )
+          ),
         });
       } catch (error) {
         dispatch(getFoodListingsFailure(error.message));
       }
     };
 
-    fetchFoodListings();
-  }, [dispatch, user.id]);
+    fetchCharityData();
+  }, [dispatch]);
 
   const handleClaimFood = async (listing) => {
     try {
@@ -277,58 +282,78 @@ const CharityDashboard = () => {
         </Grid>
       </Grid>
 
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        History of Food Requests
-      </Typography>
+      {foodListings.some(
+        (listing) =>
+          listing.claimedBy === user.id &&
+          (listing.status === 'delivered' || listing.status === 'cancelled')
+      ) && (
+        <>
+          <Typography variant="h5" sx={{ mb: 3 }}>
+            History of Food Requests
+          </Typography>
+          <Grid container spacing={3}>
+            {foodListings
+              .filter(
+                (listing) =>
+                  listing.claimedBy === user.id &&
+                  (listing.status === 'delivered' || listing.status === 'cancelled')
+              )
+              .map((listing) => (
+                <Grid item xs={12} sm={6} md={4} key={listing._id}>
+                  <FoodListingCard listing={listing} />
+                </Grid>
+              ))}
+          </Grid>
+        </>
+      )}
 
-      <Grid container spacing={3}>
-        {foodListings
-          .filter(
-            (listing) =>
-              listing.claimedBy === user.id &&
-              (listing.status === 'delivered' || listing.status === 'cancelled')
-          )
-          .map((listing) => (
-            <Grid item xs={12} sm={6} md={4} key={listing._id}>
-              <FoodListingCard listing={listing} />
-            </Grid>
-          ))}
-      </Grid>
+      {foodListings.some(
+        (listing) =>
+          listing.claimedBy === user.id && listing.status !== 'available'
+      ) && (
+        <>
+          <Typography variant="h5" sx={{ mt: 6, mb: 3 }}>
+            Your Claimed Donations
+          </Typography>
+          <Grid container spacing={3}>
+            {foodListings
+              .filter(
+                (listing) =>
+                  listing.claimedBy === user.id && listing.status !== 'available'
+              )
+              .map((listing) => (
+                <Grid item xs={12} sm={6} md={4} key={listing._id}>
+                  <FoodListingCard listing={listing} />
+                </Grid>
+              ))}
+          </Grid>
+        </>
+      )}
 
-      <Typography variant="h5" sx={{ mt: 6, mb: 3 }}>
-        Your Claimed Donations
-      </Typography>
-
-      <Grid container spacing={3}>
-        {foodListings
-          .filter(
-            (listing) =>
-              listing.claimedBy === user.id && listing.status !== 'available'
-          )
-          .map((listing) => (
-            <Grid item xs={12} sm={6} md={4} key={listing._id}>
-              <FoodListingCard listing={listing} />
-            </Grid>
-          ))}
-      </Grid>
-
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        Current Food Requests
-      </Typography>
-
-      <Grid container spacing={3}>
-        {foodListings
-          .filter(
-            (listing) =>
-              listing.claimedBy === user.id &&
-              (listing.status === 'claimed' || listing.status === 'in-progress')
-          )
-          .map((listing) => (
-            <Grid item xs={12} sm={6} md={4} key={listing._id}>
-              <FoodListingCard listing={listing} />
-            </Grid>
-          ))}
-      </Grid>
+      {foodListings.some(
+        (listing) =>
+          listing.claimedBy === user.id &&
+          (listing.status === 'claimed' || listing.status === 'in-progress')
+      ) && (
+        <>
+          <Typography variant="h5" sx={{ mb: 3 }}>
+            Current Food Requests
+          </Typography>
+          <Grid container spacing={3}>
+            {foodListings
+              .filter(
+                (listing) =>
+                  listing.claimedBy === user.id &&
+                  (listing.status === 'claimed' || listing.status === 'in-progress')
+              )
+              .map((listing) => (
+                <Grid item xs={12} sm={6} md={4} key={listing._id}>
+                  <FoodListingCard listing={listing} />
+                </Grid>
+              ))}
+          </Grid>
+        </>
+      )}
 
       <Dialog open={pickupDialog} onClose={() => setPickupDialog(false)}>
         <DialogTitle>Schedule Pickup</DialogTitle>
