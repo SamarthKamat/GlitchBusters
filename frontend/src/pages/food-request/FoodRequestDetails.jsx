@@ -34,7 +34,7 @@ const FoodRequestDetails = () => {
 
   const fetchRequestDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/charity_request/request/${id}`, {
+      const response = await axios.get(`${config.apiBaseUrl}/charity_request/request/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setRequest(response.data);

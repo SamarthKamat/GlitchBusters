@@ -31,6 +31,7 @@ import {
   getFoodListingsFailure
 } from '../../store/slices/foodSlice';
 import axios from 'axios';
+import config from '../../config';
 
 // Add this function before the FoodListings component
 const getStatusColor = (status) => {
@@ -77,7 +78,7 @@ const FoodListings = () => {
     const fetchFoodListings = async () => {
       try {
         dispatch(getFoodListingsStart());
-        const response = await axios.get('http://localhost:5000/api/food', {
+        const response = await axios.get(`${config.apiBaseUrl}/food`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         dispatch(getFoodListingsSuccess(response.data));

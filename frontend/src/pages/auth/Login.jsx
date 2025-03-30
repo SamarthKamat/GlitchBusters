@@ -37,7 +37,7 @@ const Login = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       dispatch(loginStart());
-      const response = await axios.post('http://localhost:5000/api/auth/login', values);
+      const response = await axios.post(`${config.apiBaseUrl}/auth/login`, values);
       dispatch(loginSuccess(response.data));
       
       // Use role-based dashboard routing instead of hardcoded '/dashboard'

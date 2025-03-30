@@ -91,7 +91,7 @@ const Explore = () => {
 
   useEffect(() => {
     // Fetch recommendations on page load
-    axios.get('http://localhost:5000/api/recommendations', {
+    axios.get(`${config.apiBaseUrl}/recommendations`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       withCredentials: true
     })
@@ -100,7 +100,7 @@ const Explore = () => {
   }, []);
 
   const handleSearch = () => {
-    axios.get('http://localhost:5000/api/search', {
+    axios.get(`${config.apiBaseUrl}/search`, {
       params: { query: searchQuery },
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       withCredentials: true

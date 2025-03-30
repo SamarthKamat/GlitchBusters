@@ -67,7 +67,7 @@ const Layout = () => {
   const fetchFoodListings = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('http://localhost:5000/api/food', {
+      const response = await axios.get(`${config.apiBaseUrl}/food`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       const listings = response.data || [];
@@ -134,7 +134,7 @@ const Layout = () => {
   const handleChatSubmit = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.post('http://localhost:5000/api/chat', { 
+      const response = await axios.post(`${config.apiBaseUrl}/chat`, { 
         message: chatMessage 
       }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
