@@ -213,10 +213,17 @@ const Explore = () => {
       <Grid container spacing={3}>
         {recommendations.map((item) => (
           <Grid item xs={12} sm={6} md={4} key={item._id}>
-            <FoodListingCard
-              listing={item}
-              onClick={() => handleCardClick(item.type === 'charity' ? 'charity' : 'food', item._id)}
-            />
+            {item.type === 'charity' ? (
+              <CharityRequestCard
+                request={item}
+                onClick={() => handleCardClick('charity', item._id)}
+              />
+            ) : (
+              <FoodListingCard
+                listing={item}
+                onClick={() => handleCardClick('food', item._id)}
+              />
+            )}
           </Grid>
         ))}
       </Grid>

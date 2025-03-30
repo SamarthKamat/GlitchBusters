@@ -96,7 +96,7 @@ const CreateFoodRequest = () => {
     };
 
     try {
-      await axios.post('http://localhost:5000/api/food', requestData, {
+      await axios.post('http://localhost:5000/api/charity_request/create_request', requestData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       navigate('/food-requests')

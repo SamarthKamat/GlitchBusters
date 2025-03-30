@@ -17,7 +17,13 @@ router.get('/', protect, async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(10);
 
-      res.json(recommendations);
+      // Add type field to each recommendation
+      const formattedRecommendations = recommendations.map(rec => ({
+        ...rec.toObject(),
+        type: 'charity'
+      }));
+
+      res.json(formattedRecommendations);
     } 
     else if (req.user.role === 'charity') {
       // For charities, find available food donations
@@ -30,7 +36,13 @@ router.get('/', protect, async (req, res) => {
       .sort({ expiryDate: 1 })
       .limit(10);
 
-      res.json(recommendations);
+      // Add type field to each recommendation
+      const formattedRecommendations = recommendations.map(rec => ({
+        ...rec.toObject(),
+        type: 'food'
+      }));
+
+      res.json(formattedRecommendations);
     } 
     else {
       res.status(400).json({ message: 'Recommendations not available for this user role' });

@@ -170,13 +170,18 @@ router.patch('/:id/status', protect, async (req, res) => {
 // Get statistics for impact dashboard
 router.get('/stats/impact', protect, async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const query = { donor: req.user.id };
     const stats = await Food.aggregate([
-      { $match: { status: 'delivered' } },
+      { $match: query },
       {
         $group: {
-          _id: null,
+          _id: '$status',
+          count: { $sum: 1 },
           totalQuantity: { $sum: '$quantity' },
-          totalDonations: { $sum: 1 },
           categories: { $addToSet: '$category' }
         }
       }
@@ -188,13 +193,17 @@ router.get('/stats/impact', protect, async (req, res) => {
     const monthlyStats = await Food.aggregate([
       {
         $match: {
-          status: 'delivered',
+          ...query,
           createdAt: { $gte: twelveMonthsAgo }
         }
       },
       {
         $group: {
-          _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
+          _id: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+            status: '$status'
+          },
           quantity: { $sum: '$quantity' },
           count: { $sum: 1 }
         }
@@ -202,8 +211,18 @@ router.get('/stats/impact', protect, async (req, res) => {
       { $sort: { '_id.year': 1, '_id.month': 1 } }
     ]);
 
+    // Format stats by status
+    const formattedStats = stats.reduce((acc, stat) => {
+      acc[stat._id] = {
+        count: stat.count,
+        totalQuantity: stat.totalQuantity,
+        categories: stat.categories
+      };
+      return acc;
+    }, {});
+
     res.json({
-      overall: stats[0] || { totalQuantity: 0, totalDonations: 0, categories: [] },
+      stats: formattedStats,
       monthly: monthlyStats
     });
   } catch (error) {
@@ -211,19 +230,150 @@ router.get('/stats/impact', protect, async (req, res) => {
   }
 });
 
-// Get listings by donor
+// Get active listings for business
+router.get('/active-listings', protect, async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== 'business') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const activeListings = await Food.find({
+      donor: req.user.id,
+      status: 'available'
+    })
+    .sort({ createdAt: -1 })
+    .populate('donor', 'name organization');
+
+    res.json(activeListings);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get donation history with detailed stats
+router.get('/donation-history', protect, async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== 'business') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const { status, startDate, endDate, limit = 10 } = req.query;
+    const query = { donor: req.user.id };
+
+    if (status) query.status = status;
+    if (startDate && endDate) {
+      query.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
+
+    const [donations, stats] = await Promise.all([
+      Food.find(query)
+        .sort({ createdAt: -1 })
+        .limit(parseInt(limit))
+        .populate('claimedBy', 'name organization')
+        .populate('volunteer', 'name'),
+      Food.aggregate([
+        { $match: { donor: req.user.id } },
+        {
+          $group: {
+            _id: '$status',
+            count: { $sum: 1 },
+            totalQuantity: { $sum: '$quantity' },
+            categories: { $addToSet: '$category' }
+          }
+        }
+      ])
+    ]);
+
+    const formattedStats = stats.reduce((acc, stat) => {
+      acc[stat._id] = {
+        count: stat.count,
+        totalQuantity: stat.totalQuantity,
+        categories: stat.categories
+      };
+      return acc;
+    }, {});
+
+    res.json({
+      donations,
+      stats: formattedStats
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get listings by donor with filters and pagination
 router.get('/my-listings', protect, async (req, res) => {
   try {
     if (!req.user || req.user.role !== 'business') {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    const foodListings = await Food.find({ donor: req.user.id })
-      .populate('claimedBy', 'name organization')
-      .populate('volunteer', 'name')
-      .sort({ createdAt: -1 });
+    const { status, page = 1, limit = 10, sortBy = 'createdAt', order = 'desc' } = req.query;
+    const query = { donor: req.user.id };
+    if (status) query.status = status;
 
-    res.json(foodListings);
+    const options = {
+      sort: { [sortBy]: order === 'desc' ? -1 : 1 },
+      skip: (page - 1) * limit,
+      limit: parseInt(limit),
+      populate: [
+        { path: 'claimedBy', select: 'name organization' },
+        { path: 'volunteer', select: 'name' }
+      ]
+    };
+
+    const [foodListings, total] = await Promise.all([
+      Food.find(query, null, options),
+      Food.countDocuments(query)
+    ]);
+
+    res.json({
+      foodListings,
+      pagination: {
+        total,
+        pages: Math.ceil(total / limit),
+        currentPage: parseInt(page),
+        perPage: parseInt(limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get active listings count and statistics
+router.get('/active-stats', protect, async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== 'business') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const stats = await Food.aggregate([
+      { $match: { donor: req.user.id } },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+          totalQuantity: { $sum: '$quantity' },
+          categories: { $addToSet: '$category' }
+        }
+      }
+    ]);
+
+    const formattedStats = stats.reduce((acc, stat) => {
+      acc[stat._id] = {
+        count: stat.count,
+        totalQuantity: stat.totalQuantity,
+        categories: stat.categories
+      };
+      return acc;
+    }, {});
+
+    res.json(formattedStats);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

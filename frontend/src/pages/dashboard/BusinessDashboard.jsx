@@ -54,10 +54,7 @@ const BusinessDashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const { foodListings, loading } = useSelector((state) => state.food);
   const [stats, setStats] = useState({
-    totalDonations: 5,
-    activeDonations: 10,
-    claimedDonations: 2,
-    deliveredDonations: 0
+    activeDonations: 0
   });
 
   useEffect(() => {
@@ -74,15 +71,8 @@ const BusinessDashboard = () => {
           (listing) => listing.donor === user.id
         );
         setStats({
-          totalDonations: myListings.length,
           activeDonations: myListings.filter(
             (listing) => listing.status === 'available'
-          ).length,
-          claimedDonations: myListings.filter(
-            (listing) => listing.status === 'claimed'
-          ).length,
-          deliveredDonations: myListings.filter(
-            (listing) => listing.status === 'delivered'
           ).length
         });
       } catch (error) {
@@ -264,34 +254,7 @@ const BusinessDashboard = () => {
                 flexWrap: 'wrap',
                 justifyContent: { xs: 'center', md: 'flex-end' }
               }}>
-                <Card sx={{ 
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  backdropFilter: 'blur(10px)',
-                  p: 2,
-                  borderRadius: 3,
-                  minWidth: 200
-                }}>
-                  <Typography variant="h4" sx={{ color: 'white', fontWeight: 700 }}>
-                    {stats.totalDonations}
-                  </Typography>
-                  <Typography sx={{ color: 'rgba(255,255,255,0.9)' }}>
-                    Total Donations
-                  </Typography>
-                </Card>
-                <Card sx={{ 
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  backdropFilter: 'blur(10px)',
-                  p: 2,
-                  borderRadius: 3,
-                  minWidth: 200
-                }}>
-                  <Typography variant="h4" sx={{ color: 'white', fontWeight: 700 }}>
-                    {stats.deliveredDonations}
-                  </Typography>
-                  <Typography sx={{ color: 'rgba(255,255,255,0.9)' }}>
-                    Lives Impacted
-                  </Typography>
-                </Card>
+
               </Box>
             </Grid>
           </Grid>
@@ -310,24 +273,6 @@ const BusinessDashboard = () => {
                   value: stats.activeDonations,
                   icon: <RestaurantIcon />,
                   color: "#4CAF50"
-                },
-                {
-                  title: "In Progress",
-                  value: stats.claimedDonations,
-                  icon: <LocalShippingIcon />,
-                  color: "#FF9800"
-                },
-                {
-                  title: "This Month",
-                  value: stats.totalDonations,
-                  icon: <CalendarTodayIcon />,  // Changed from CalendarMonthIcon
-                  color: "#2196F3"
-                },
-                {
-                  title: "Impact Score",
-                  value: "A+",
-                  icon: <EmojiEventsIcon />,
-                  color: "#9C27B0"
                 }
               ].map((stat, index) => (
                 <Grid item xs={12} sm={6} md={3} key={index}>

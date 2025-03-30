@@ -63,7 +63,7 @@ const About = () => {
         <Grid container spacing={6} alignItems="center" sx={{ mb: 12 }}>
           <Grid item xs={12} md={6}>
             <Typography variant="body1" sx={{ fontSize: '1.1rem', lineHeight: 1.8 }}>
-              At GlitchBusters, we bridge the gap between food surplus and 
+              At AnnaPradana, we bridge the gap between food surplus and 
               food insecurity using real-time data and community networks.
             </Typography>
           </Grid>

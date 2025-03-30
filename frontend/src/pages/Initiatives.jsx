@@ -109,7 +109,7 @@ const Initiatives = () => {
                 Programs that make a difference
               </Typography>
               <Typography variant="body1" paragraph>
-                At GlitchBusters, we run several key initiatives to reduce food waste and address hunger in our communities.
+                At AnnaPradana, we run several key initiatives to reduce food waste and address hunger in our communities.
                 Each program is designed to tackle different aspects of the food waste problem while creating meaningful
                 connections between businesses, charities, and volunteers.
               </Typography>

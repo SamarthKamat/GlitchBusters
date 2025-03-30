@@ -228,7 +228,7 @@ const Home = () => {
         <Container maxWidth="lg">
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography variant="h5" component="div" sx={{ fontWeight: 700, color: '#2E7D32' }}>
-              GlitchBusters
+              AnnaPradana
             </Typography>
             <Stack direction="row" spacing={4}>
               <Typography variant="body1" component={RouterLink} to="/" sx={{ fontWeight: 600, textDecoration: 'none', color: 'inherit' }}>Home</Typography>
@@ -769,28 +769,6 @@ const Home = () => {
                 </Grid>
               </Box>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  position: 'relative',
-                  height: { xs: '300px', md: '400px' },
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-                }}
-              >
-                <Box
-                  component="img"
-                  src="https://images.unsplash.com/photo-1593113598332-cd59a0c3a9a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-                  alt="Impact"
-                  sx={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
-                  }}
-                />
-              </Box>
-            </Grid>
           </Grid>
         </Container>
       </Box>
@@ -934,7 +912,7 @@ const Home = () => {
           <Grid container spacing={4}>
             <Grid item xs={12} md={4}>
               <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
-                GlitchBusters
+                AnnaPradana
               </Typography>
               <Typography variant="body2" sx={{ mb: 3, opacity: 0.8 }}>
                 Our mission is to reduce food waste by connecting businesses with surplus food to local charities, creating a more sustainable and equitable food system.
@@ -1018,7 +996,7 @@ const Home = () => {
           </Grid>
           <Divider sx={{ my: 4, borderColor: 'rgba(255,255,255,0.1)' }} />
           <Typography variant="body2" align="center" sx={{ opacity: 0.7 }}>
-            © {new Date().getFullYear()} GlitchBusters. All rights reserved.
+            © {new Date().getFullYear()} AnnaPradana. All rights reserved.
           </Typography>
         </Container>
       </Box>

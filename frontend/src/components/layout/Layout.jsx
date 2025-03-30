@@ -48,6 +48,7 @@ import {
   TextField,
 } from '@mui/material';
 import { Chat as ChatIcon } from '@mui/icons-material';
+import axios from 'axios';
 
 const drawerWidth = 280;
 
@@ -66,9 +67,10 @@ const Layout = () => {
   const fetchFoodListings = async () => {
     try {
       setIsLoading(true);
-      const client = await Client.connect("https://e26c0a78286954790a.gradio.live/");
-      const result = await client.predict("/view_listings_interface", {});
-      const listings = result?.data ? JSON.parse(result.data) : [];
+      const response = await axios.get('http://localhost:5000/api/food', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      const listings = response.data || [];
       setGradioResult(listings);
       // Update notification count
       dispatch(setNotificationCount(listings.length));
@@ -132,11 +134,12 @@ const Layout = () => {
   const handleChatSubmit = async () => {
     try {
       setIsLoading(true);
-      const client = await Client.connect("https://e2763c87228d3ac3c3.gradio.live/");
-      const result = await client.predict("/chat", { 
+      const response = await axios.post('http://localhost:5000/api/chat', { 
         message: chatMessage 
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      setChatResponse(result.data);
+      setChatResponse(response.data.message);
     } catch (error) {
       console.error('Error sending chat message:', error);
       setChatResponse('Sorry, there was an error processing your message.');

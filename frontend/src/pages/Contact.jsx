@@ -61,7 +61,7 @@ const Contact = () => {
       answer: 'Businesses can sign up for a free account on our platform. Once registered, you can list available surplus food, and our system will match you with nearby charities. Our volunteers can also help with pickup if needed.'
     },
     {
-      question: 'How do I volunteer with GlitchBusters?',
+      question: 'How do I volunteer with AnnaPradana?',
       answer: 'You can sign up as a volunteer on our platform. After registration, you can choose from various volunteer opportunities including food pickup, delivery, event support, and awareness campaigns.'
     },
     {
@@ -70,7 +70,7 @@ const Contact = () => {
     },
     {
       question: 'Is my financial donation tax-deductible?',
-      answer: 'Yes, GlitchBusters is a registered 501(c)(3) non-profit organization, and all financial donations are tax-deductible to the extent allowed by law. You will receive a receipt for your donation that can be used for tax purposes.'
+      answer: 'Yes, AnnaPradana is a registered 501(c)(3) non-profit organization, and all financial donations are tax-deductible to the extent allowed by law. You will receive a receipt for your donation that can be used for tax purposes.'
     },
     {
       question: 'How is the donated food transported?',
